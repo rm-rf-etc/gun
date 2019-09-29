@@ -1,24 +1,27 @@
 ;(function(){
 
-  /* UNBUILD */
-  var root;
-  if(typeof window !== "undefined"){ root = window }
-  if(typeof global !== "undefined"){ root = global }
-  root = root || {};
-  var console = root.console || {log: function(){}};
-  function USE(arg, req){
-    return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
-      arg(mod = {exports: {}});
-      USE[R(path)] = mod.exports;
-    }
-    function R(p){
-      return p.split('/').slice(-1).toString().replace('.js','');
-    }
-  }
-  if(typeof module !== "undefined"){ var common = module }
-  /* UNBUILD */
+	/* UNBUILD */
+	var root;
+	var modules = {};
+	if(typeof window !== "undefined"){ root = window }
+	if(typeof global !== "undefined"){ root = global }
+	root = root || {};
+	var console = root.console || {log: function(){}};
+	function USE(arg, req){
+		return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
+			arg(mod = {exports: {}});
+			USE[R(path)] = mod.exports;
+		}
+		function R(p){
+			return p.split('/').slice(-1).toString().replace('.js','');
+		}
+	}
+	if(typeof module !== "undefined"){ var common = module }
+	/* UNBUILD */
 
-	;USE(function(module){
+	// ---
+
+	modules['./type'] = USE(function(module){
 		// Generic javascript utilities.
 		var Type = {};
 		//Type.fns = Type.fn = {is: function(fn){ return (!!fn && fn instanceof Function) }}
@@ -158,9 +161,13 @@
 		var list_is = Type.list.is;
 		var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
 		module.exports = Type;
-	})(USE, './type');
+	// })(USE, './type');
+	});
+	// modules['./type'](USE, './type');
 
-	;USE(function(module){
+	// ---
+
+	modules['./onto'] = USE(function(module){
 		// On event emitter generic javascript utility.
 		module.exports = function onto(tag, arg, as){
 			if(!tag){ return {to: onto} }
@@ -198,9 +205,13 @@
 			if((tag = tag.to) && u !== arg){ tag.next(arg) }
 			return tag;
 		};
-	})(USE, './onto');
+	// })(USE, './onto');
+	});
+	// modules['./onto'](USE, './onto');
 
-	;USE(function(module){
+	// ---
+
+	modules['./HAM'] = USE(function(module){
 		/* Based on the Hypothetical Amnesia Machine thought experiment */
 		function HAM(machineState, incomingState, currentState, incomingValue, currentValue){
 			if(machineState < incomingState){
@@ -245,9 +256,13 @@
 		}
 		var Lexical = JSON.stringify, undefined;
 		module.exports = HAM;
-	})(USE, './HAM');
+	// })(USE, './HAM');
+	});
+	// modules['./HAM'](USE, './HAM');
 
-	;USE(function(module){
+	// ---
+
+	modules['./val'] = USE(function(module){
 		var Type = USE('./type');
 		var Val = {};
 		Val.is = function(v){ // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
@@ -290,9 +305,13 @@
 		var text_is = Type.text.is;
 		var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 		module.exports = Val;
-	})(USE, './val');
+	// })(USE, './val');
+	});
+	// modules['./val'](USE, './val');
 
-	;USE(function(module){
+	// ---
+
+	modules['./node'] = USE(function(module){
 		var Type = USE('./type');
 		var Val = USE('./val');
 		var Node = {_: '_'};
@@ -349,9 +368,13 @@
 		var soul_ = Node.soul._;
 		var u;
 		module.exports = Node;
-	})(USE, './node');
+	// })(USE, './node');
+	});
+	// modules['./node'](USE, './node');
 
-	;USE(function(module){
+	// ---
+
+	modules['./state'] = USE(function(module){
 		var Type = USE('./type');
 		var Node = USE('./node');
 		function State(){
@@ -433,9 +456,13 @@
 		var fn = Type.fn, fn_is = fn.is;
 		var N_ = Node._, u;
 		module.exports = State;
-	})(USE, './state');
+	// })(USE, './state');
+	});
+	// modules['./state'](USE, './state');
 
-	;USE(function(module){
+	// ---
+
+	modules['./graph'] = USE(function(module){
 		var Type = USE('./type');
 		var Val = USE('./val');
 		var Node = USE('./node');
@@ -589,9 +616,13 @@
 		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
 		var u;
 		module.exports = Graph;
-	})(USE, './graph');
+	// })(USE, './graph');
+	});
+	// modules['./graph'](USE, './graph');
 
-	;USE(function(module){
+	// ---
+
+	modules['./ask'] = USE(function(module){
 		// request / response module, for asking and acking messages.
 		USE('./onto'); // depends upon onto!
 		module.exports = function ask(cb, as){
@@ -613,9 +644,13 @@
 			}, (this.opt||{}).lack || 9000);
 			return id;
 		}
-	})(USE, './ask');
+	// })(USE, './ask');
+	});
+	// modules['./ask'](USE, './ask');
 
-	;USE(function(module){
+	// ---
+
+	modules['./dup'] = USE(function(module){
 		var Type = USE('./type');
 		function Dup(opt){
 			var dup = {s:{}};
@@ -645,9 +680,13 @@
 		}
 		var time_is = Type.time.is;
 		module.exports = Dup;
-	})(USE, './dup');
+	// })(USE, './dup');
+	});
+	// modules['./dup'](USE, './dup');
 
-	;USE(function(module){
+	// ---
+
+	modules['./root'] = USE(function(module){
 
 		function Gun(o){
 			if(o instanceof Gun){ return (this._ = {gun: this, $: this}).$ }
@@ -882,9 +921,13 @@
 				},1);
 			});
 		});*/
-	})(USE, './root');
+	// })(USE, './root');
+	});
+	// modules['./root'](USE, './root');
 
-	;USE(function(module){
+	// ---
+
+	modules['./back'] = USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.back = function(n, opt){ var tmp;
 			n = n || 1;
@@ -923,9 +966,13 @@
 			return this;
 		}
 		var empty = {}, u;
-	})(USE, './back');
+	// })(USE, './back');
+	});
+	// modules['./back'](USE, './back');
 
-	;USE(function(module){
+	// ---
+
+	modules['./chain'] = USE(function(module){
 		// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 		// is complicated and was extremely hard to build. If you port GUN to another
 		// language, consider implementing an easier API to build.
@@ -1220,9 +1267,13 @@
 		var obj = Gun.obj, obj_has = obj.has, obj_put = obj.put, obj_del = obj.del, obj_to = obj.to, obj_map = obj.map;
 		var text_rand = Gun.text.random;
 		var _soul = Gun.val.link._, node_ = Gun.node._;
-	})(USE, './chain');
+	// })(USE, './chain');
+	});
+	// modules['./chain'](USE, './chain');
 
-	;USE(function(module){
+	// ---
+
+	modules['./get'] = USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.get = function(key, cb, as){
 			var gun, tmp;
@@ -1361,9 +1412,13 @@
 		var num_is = Gun.num.is;
 		var rel = Gun.val.link, node_soul = Gun.node.soul, node_ = Gun.node._;
 		var empty = {}, u;
-	})(USE, './get');
+	// })(USE, './get');
+	});
+	// modules['./get'](USE, './get');
 
-	;USE(function(module){
+	// ---
+
+	modules['./put'] = USE(function(module){
 		var Gun = USE('./root');
 		Gun.chain.put = function(data, cb, as){
 			// #soul.has=value>state
@@ -1594,18 +1649,26 @@
 		var obj = Gun.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 		var u, empty = {}, noop = function(){}, iife = function(fn,as){fn.call(as||empty)};
 		var node_ = Gun.node._;
-	})(USE, './put');
+	// })(USE, './put');
+	});
+	// modules['./put'](USE, './put');
 
-	;USE(function(module){
+	// ---
+
+	modules['./index'] = USE(function(module){
 		var Gun = USE('./root');
 		USE('./chain');
 		USE('./back');
 		USE('./put');
 		USE('./get');
 		module.exports = Gun;
-	})(USE, './index');
+	// })(USE, './index');
+	});
+	// modules['./index'](USE, './index');
 
-	;USE(function(module){
+	// ---
+
+	modules['./on'] = USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
@@ -1745,9 +1808,13 @@
 		var obj = Gun.obj, obj_map = obj.map, obj_has = obj.has, obj_del = obj.del, obj_to = obj.to;
 		var rel = Gun.val.link;
 		var empty = {}, noop = function(){}, u;
-	})(USE, './on');
+	// })(USE, './on');
+	});
+	// modules['./on'](USE, './on');
 
-	;USE(function(module){
+	// ---
+
+	modules['./map'] = USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.map = function(cb, opt, t){
 			var gun = this, cat = gun._, chain;
@@ -1782,9 +1849,13 @@
 			((tmp = gun.get(k)._).echo || (tmp.echo = {}))[cat.id] = tmp.echo[cat.id] || cat;
 		}
 		var obj_map = Gun.obj.map, noop = function(){}, event = {stun: noop, off: noop}, n_ = Gun.node._, u;
-	})(USE, './map');
+	// })(USE, './map');
+	});
+	// modules['./map'](USE, './map');
 
-	;USE(function(module){
+	// ---
+
+	modules['./set'] = USE(function(module){
 		var Gun = USE('./index');
 		Gun.chain.set = function(item, cb, opt){
 			var gun = this, soul;
@@ -1803,9 +1874,13 @@
 			},true);
 			return item;
 		}
-	})(USE, './set');
+	// })(USE, './set');
+	});
+	// modules['./set'](USE, './set');
 
-	;USE(function(module){
+	// ---
+
+	modules['./adapters/localStorage'] = USE(function(module){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
 		var root, noop = function(){}, store, u;
@@ -1950,9 +2025,13 @@
 				});
 			}
 		});
-	})(USE, './adapters/localStorage');
+	// })(USE, './adapters/localStorage');
+	});
+	// modules['./adapters/localStorage'](USE, './adapters/localStorage');
 
-	;USE(function(module){
+	// ---
+
+	modules['./adapters/mesh'] = USE(function(module){
 		var Type = USE('../type');
 
 		function Mesh(root){
@@ -2063,7 +2142,7 @@
 				}
 				mesh.say.c = mesh.say.d = 0;
 			}());
-			
+
 			// for now - find better place later.
 			function send(raw, peer){ try{
 				var wire = peer.wire;
@@ -2132,7 +2211,7 @@
 					Type.obj.map(tmp, function(msg){
 						mesh.say(msg, peer);
 					}); */
-					// @rogowski 2: I think with my PID fix we can delete this and use the original. 
+					// @rogowski 2: I think with my PID fix we can delete this and use the original.
 					return;
 				}
 				if(peer.pid){ return }
@@ -2146,7 +2225,7 @@
 			});
 
 			root.on('bye', function(peer, tmp){
-				peer = opt.peers[peer.id || peer] || peer; 
+				peer = opt.peers[peer.id || peer] || peer;
 				this.to.next(peer);
 				peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
 				Type.obj.del(opt.peers, peer.id);
@@ -2172,16 +2251,16 @@
 		;(function(){
 			Type.text.hash = function(s){ // via SO
 				if(typeof s !== 'string'){ return {err: 1} }
-		    var c = 0;
-		    if(!s.length){ return c }
-		    for(var i=0,l=s.length,n; i<l; ++i){
-		      n = s.charCodeAt(i);
-		      c = ((c<<5)-c)+n;
-		      c |= 0;
-		    }
-		    return c; // Math.abs(c);
+			var c = 0;
+			if(!s.length){ return c }
+			for(var i=0,l=s.length,n; i<l; ++i){
+			  n = s.charCodeAt(i);
+			  c = ((c<<5)-c)+n;
+			  c |= 0;
+			}
+			return c; // Math.abs(c);
 		  }
-			
+
 			var $ = JSON.stringify, u;
 
 			Type.obj.hash = function(obj, hash){
@@ -2205,9 +2284,13 @@
 
 	  try{ module.exports = Mesh }catch(e){}
 
-	})(USE, './adapters/mesh');
+	// })(USE, './adapters/mesh');
+	});
+	// modules['./adapters/mesh'](USE, './adapters/mesh');
 
-	;USE(function(module){
+	// ---
+
+	modules['./adapters/websocket'] = USE(function(module){
 		var Gun = USE('../index');
 		Gun.Mesh = USE('./mesh');
 
@@ -2263,6 +2346,29 @@
 			var doc = 'undefined' !== typeof document && document;
 		});
 		var noop = function(){};
-	})(USE, './adapters/websocket');
+	// })(USE, './adapters/websocket');
+	});
+	// modules['./adapters/websocket'](USE, './adapters/websocket');
 
+	modules['./type'](USE, './type');
+	modules['./onto'](USE, './onto');
+	modules['./HAM'](USE, './HAM');
+	modules['./val'](USE, './val');
+	modules['./node'](USE, './node');
+	modules['./state'](USE, './state');
+	modules['./graph'](USE, './graph');
+	modules['./ask'](USE, './ask');
+	modules['./dup'](USE, './dup');
+	modules['./root'](USE, './root');
+	modules['./back'](USE, './back');
+	modules['./chain'](USE, './chain');
+	modules['./get'](USE, './get');
+	modules['./put'](USE, './put');
+	modules['./index'](USE, './index');
+	modules['./on'](USE, './on');
+	modules['./map'](USE, './map');
+	modules['./set'](USE, './set');
+	modules['./adapters/localStorage'](USE, './adapters/localStorage');
+	modules['./adapters/mesh'](USE, './adapters/mesh');
+	modules['./adapters/websocket'](USE, './adapters/websocket');
 }());
