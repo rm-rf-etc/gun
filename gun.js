@@ -11,13 +11,16 @@
 	const exported = {};
 	function USE(name, fn){
 		if (name && fn) {
+			// console.log('DECLARE MODULE:', name);
 			modules[name] = function(){
 				const mod = { exports: {} };
 				fn(mod);
 				exported[name] = mod.exports;
 			}
+			return;
 		}
 		if (!exported[name]) {
+			// console.log('USE MODULE:', name);
 			modules[name]();
 		}
 		return exported[name];
@@ -681,26 +684,49 @@
 
 	// ---
 
-	USE('./root', function(module){
+	USE('./gun', function(module){
 
-		function Gun(o){
+		module.exports = function Gun(o){
 			if(o instanceof Gun){ return (this._ = {gun: this, $: this}).$ }
 			if(!(this instanceof Gun)){ return new Gun(o) }
 			return Gun.create(this._ = {gun: this, $: this, opt: o});
 		}
+	});
+
+	// ---
+
+	USE('./root', function(module){
+
+		const Gun = USE('./gun');
+		module.exports = Gun;
 
 		Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
 
 		Gun.version = 0.9;
 
-		Gun.chain = Gun.prototype;
-		Gun.chain.toJSON = function(){};
-
 		var Type = USE('./type');
 		Type.obj.to(Type, Gun);
+
 		Gun.HAM = USE('./HAM');
 		Gun.val = USE('./val');
 		Gun.node = USE('./node');
+
+		Gun.chain = Gun.prototype;
+		Gun.chain.toJSON = function(){};
+		Gun.chain.chain = USE('./chain');
+		Gun.chain.back = USE('./back');
+		Gun.chain.get = USE('./get');
+		Gun.chain.put = USE('./put');
+		Gun.chain.on = USE('./on').on;
+		Gun.chain.once = USE('./on').once;
+		Gun.chain.off = USE('./on').off;
+		Gun.chain.map = USE('./map');
+		Gun.chain.set = USE('./set');
+		Gun.chain.val = function(cb, opt){
+			Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
+			return Gun.once(cb, opt);
+		}
+
 		Gun.state = USE('./state');
 		Gun.graph = USE('./graph');
 		Gun.on = USE('./onto');
@@ -904,7 +930,6 @@
 		if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window }
 		try{ if(typeof common !== "undefined"){ common.exports = Gun } }catch(e){}
 
-		module.exports = Gun;
 
 		/*Gun.on('opt', function(ctx){ // FOR TESTING PURPOSES
 			this.to.next(ctx);
@@ -917,13 +942,17 @@
 				},1);
 			});
 		});*/
+
+		modules['./adapters/localStorage']();
+		modules['./adapters/mesh']();
+		modules['./adapters/websocket']();
 	});
 
 	// ---
 
 	USE('./back', function(module){
-		var Gun = USE('./root');
-		Gun.chain.back = function(n, opt){ var tmp;
+		// var Gun = USE('./root');
+		module.exports = function(n, opt){ var tmp;
 			n = n || 1;
 			if(-1 === n || Infinity === n){
 				return this._.root.$;
@@ -968,8 +997,9 @@
 		// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 		// is complicated and was extremely hard to build. If you port GUN to another
 		// language, consider implementing an easier API to build.
-		var Gun = USE('./root');
-		Gun.chain.chain = function(sub){
+		var Gun = USE('./gun');
+
+		module.exports = function chain(sub){
 			var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
 			cat.root = root = at.root;
 			cat.id = ++root.once;
@@ -1264,8 +1294,8 @@
 	// ---
 
 	USE('./get', function(module){
-		var Gun = USE('./root');
-		Gun.chain.get = function(key, cb, as){
+		var Gun = USE('./gun');
+		module.exports = function(key, cb, as){
 			var gun, tmp;
 			if(typeof key === 'string'){
 				var back = this, cat = back._;
@@ -1396,7 +1426,6 @@
 			return;
 			//tmp.echo[cat.id] = {}; // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
 			//obj.del(map, at); // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
-			return;
 		}
 		var obj = Gun.obj, obj_map = obj.map, obj_has = obj.has, obj_to = Gun.obj.to;
 		var num_is = Gun.num.is;
@@ -1407,8 +1436,8 @@
 	// ---
 
 	USE('./put', function(module){
-		var Gun = USE('./root');
-		Gun.chain.put = function(data, cb, as){
+		var Gun = USE('./gun');
+		module.exports = function(data, cb, as){
 			// #soul.has=value>state
 			// ~who#where.where=what>when@was
 			// TODO: BUG! Put probably cannot handle plural chains! `!as` is quickfix test.
@@ -1642,8 +1671,8 @@
 	// ---
 
 	USE('./on', function(module){
-		var Gun = USE('./root');
-		Gun.chain.on = function(tag, arg, eas, as){
+		var Gun = USE('./gun');
+		module.exports.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
 			if(typeof tag === 'string'){
 				if(!arg){ return at.on(tag) }
@@ -1690,11 +1719,7 @@
 			}
 		}
 
-		Gun.chain.val = function(cb, opt){
-			Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
-			return this.once(cb, opt);
-		}
-		Gun.chain.once = function(cb, opt){
+		module.exports.once = function(cb, opt){
 			var gun = this, at = gun._, data = at.put;
 			if(0 < at.ack && u !== data){
 				(cb || noop).call(gun, data, at.get);
@@ -1741,7 +1766,7 @@
 			opt.ok.call(gun || opt.$, data, msg.get);
 		}
 
-		Gun.chain.off = function(){
+		module.exports.off = function(){
 			// make off more aggressive. Warning, it might backfire!
 			var gun = this, at = gun._, tmp;
 			var cat = at.back;
@@ -1786,8 +1811,8 @@
 	// ---
 
 	USE('./map', function(module){
-		var Gun = USE('./root');
-		Gun.chain.map = function(cb, opt, t){
+		var Gun = USE('./gun');
+		module.exports = function(cb, opt, t){
 			var gun = this, cat = gun._, chain;
 			if(!cb){
 				if(chain = cat.each){ return chain }
@@ -1825,8 +1850,8 @@
 	// ---
 
 	USE('./set', function(module){
-		var Gun = USE('./root');
-		Gun.chain.set = function(item, cb, opt){
+		var Gun = USE('./gun');
+		module.exports = function(item, cb, opt){
 			var gun = this, soul;
 			cb = cb || function(){};
 			opt = opt || {}; opt.item = opt.item || item;
@@ -2247,14 +2272,13 @@
 
 	  var empty = {}, ok = true, u;
 
-	  try{ module.exports = Mesh }catch(e){}
-
+	  module.exports = Mesh;
 	});
 
 	// ---
 
 	USE('./adapters/websocket', function(module){
-		var Gun = USE('./root');
+		var Gun = USE('./gun');
 		Gun.Mesh = USE('./adapters/mesh');
 
 		Gun.on('opt', function(root){
@@ -2312,15 +2336,4 @@
 	});
 
 	modules['./root']();
-
-	modules['./back']();
-	modules['./chain']();
-	modules['./get']();
-	modules['./put']();
-	modules['./on']();
-	modules['./map']();
-	modules['./set']();
-	modules['./adapters/localStorage']();
-	modules['./adapters/mesh']();
-	modules['./adapters/websocket']();
 }());
