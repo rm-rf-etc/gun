@@ -9,22 +9,26 @@
 
 	const modules = {};
 	const exported = {};
-	function USE(name, fn){
+	const USE = (name, fn) => {
 		if (name && fn) {
-			// console.log('DECLARE MODULE:', name);
-			modules[name] = function(){
-				const mod = { exports: {} };
-				fn(mod);
-				exported[name] = mod.exports;
-			}
-			return;
+			const END = () => {
+				// console.log('DECLARE MODULE:', name);
+				modules[name] = function(){
+					const mod = { exports: {} };
+					fn(mod);
+					exported[name] = mod.exports;
+				}
+				return;
+			};
+			return { END };
 		}
 		if (!exported[name]) {
 			// console.log('USE MODULE:', name);
 			modules[name]();
 		}
 		return exported[name];
-	}
+	};
+
 	if(typeof module !== "undefined"){ var common = module }
 	/* UNBUILD */
 
@@ -171,7 +175,8 @@
 		var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
 
 		module.exports = Type;
-	});
+
+	}).END();
 
 	// ---
 
@@ -213,7 +218,8 @@
 			if((tag = tag.to) && u !== arg){ tag.next(arg) }
 			return tag;
 		};
-	});
+
+	}).END();
 
 	// ---
 
@@ -263,7 +269,8 @@
 		var Lexical = JSON.stringify, undefined;
 
 		module.exports = HAM;
-	});
+
+	}).END();
 
 	// ---
 
@@ -311,7 +318,8 @@
 		var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 
 		module.exports = Val;
-	});
+
+	}).END();
 
 	// ---
 
@@ -373,7 +381,8 @@
 		var u;
 
 		module.exports = Node;
-	});
+
+	}).END();
 
 	// ---
 
@@ -460,7 +469,8 @@
 		var N_ = Node._, u;
 
 		module.exports = State;
-	});
+
+	}).END();
 
 	// ---
 
@@ -619,7 +629,8 @@
 		var u;
 
 		module.exports = Graph;
-	});
+
+	}).END();
 
 	// ---
 
@@ -645,7 +656,8 @@
 			}, (this.opt||{}).lack || 9000);
 			return id;
 		}
-	});
+
+	}).END();
 
 	// ---
 
@@ -680,7 +692,8 @@
 		var time_is = Type.time.is;
 
 		module.exports = Dup;
-	});
+
+	}).END();
 
 	// ---
 
@@ -691,7 +704,8 @@
 			if(!(this instanceof Gun)){ return new Gun(o) }
 			return Gun.create(this._ = {gun: this, $: this, opt: o});
 		}
-	});
+
+	}).END();
 
 	// ---
 
@@ -946,7 +960,7 @@
 		modules['./adapters/localStorage']();
 		modules['./adapters/mesh']();
 		modules['./adapters/websocket']();
-	});
+	}).END();
 
 	// ---
 
@@ -989,7 +1003,7 @@
 			return this;
 		}
 		var empty = {}, u;
-	});
+	}).END();
 
 	// ---
 
@@ -1289,7 +1303,8 @@
 		var obj = Gun.obj, obj_has = obj.has, obj_put = obj.put, obj_del = obj.del, obj_to = obj.to, obj_map = obj.map;
 		var text_rand = Gun.text.random;
 		var _soul = Gun.val.link._, node_ = Gun.node._;
-	});
+
+	}).END();
 
 	// ---
 
@@ -1431,7 +1446,8 @@
 		var num_is = Gun.num.is;
 		var rel = Gun.val.link, node_soul = Gun.node.soul, node_ = Gun.node._;
 		var empty = {}, u;
-	});
+
+	}).END();
 
 	// ---
 
@@ -1666,7 +1682,8 @@
 		var obj = Gun.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 		var u, empty = {}, noop = function(){}, iife = function(fn,as){fn.call(as||empty)};
 		var node_ = Gun.node._;
-	});
+
+	}).END();
 
 	// ---
 
@@ -1806,7 +1823,8 @@
 		var obj = Gun.obj, obj_map = obj.map, obj_has = obj.has, obj_del = obj.del, obj_to = obj.to;
 		var rel = Gun.val.link;
 		var empty = {}, noop = function(){}, u;
-	});
+
+	}).END();
 
 	// ---
 
@@ -1845,7 +1863,8 @@
 			((tmp = gun.get(k)._).echo || (tmp.echo = {}))[cat.id] = tmp.echo[cat.id] || cat;
 		}
 		var obj_map = Gun.obj.map, noop = function(){}, event = {stun: noop, off: noop}, n_ = Gun.node._, u;
-	});
+
+	}).END();
 
 	// ---
 
@@ -1868,7 +1887,8 @@
 			},true);
 			return item;
 		}
-	});
+
+	}).END();
 
 	// ---
 
@@ -2017,7 +2037,8 @@
 				});
 			}
 		});
-	});
+
+	}).END();
 
 	// ---
 
@@ -2273,7 +2294,8 @@
 	  var empty = {}, ok = true, u;
 
 	  module.exports = Mesh;
-	});
+
+	}).END();
 
 	// ---
 
@@ -2333,7 +2355,8 @@
 			var doc = 'undefined' !== typeof document && document;
 		});
 		var noop = function(){};
-	});
+
+	}).END();
 
 	modules['./root']();
 }());
