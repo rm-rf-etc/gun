@@ -275,8 +275,9 @@
 	// ---
 
 	USE('./val', function(module){
-		var Type = USE('./type');
-		var Val = {};
+		const Type = USE('./type');
+
+		const Val = {};
 		Val.is = function(v){ // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
 			if(v === u){ return false }
 			if(v === null){ return true } // "deletes", nulling out keys.
@@ -324,9 +325,10 @@
 	// ---
 
 	USE('./node', function(module){
-		var Type = USE('./type');
-		var Val = USE('./val');
-		var Node = {_: '_'};
+		const Type = USE('./type');
+		const Val = USE('./val');
+
+		const Node = {_: '_'};
 		Node.soul = function(n, o){ return (n && n._ && n._[o || soul_]) } // convenience function to check to see if there is a soul on a node and return it.
 		Node.soul.ify = function(n, o){ // put a soul on an object.
 			o = (typeof o === 'string')? {soul: o} : o || {};
@@ -375,10 +377,10 @@
 				}
 			}
 		}());
-		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
-		var text = Type.text, text_random = text.random;
-		var soul_ = Node.soul._;
-		var u;
+		const obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
+		const text = Type.text, text_random = text.random;
+		const soul_ = Node.soul._;
+		let u;
 
 		module.exports = Node;
 
@@ -387,10 +389,11 @@
 	// ---
 
 	USE('./state', function(module){
-		var Type = USE('./type');
-		var Node = USE('./node');
+		const Type = USE('./type');
+		const Node = USE('./node');
+
 		function State(){
-			var t;
+			let t;
 			/*if(perf){
 				t = start + perf.now(); // Danger: Accuracy decays significantly over time, even if precise.
 			} else {*/
@@ -475,10 +478,12 @@
 	// ---
 
 	USE('./graph', function(module){
-		var Type = USE('./type');
-		var Val = USE('./val');
-		var Node = USE('./node');
-		var Graph = {};
+		const Type = USE('./type');
+		const Val = USE('./val');
+		const Node = USE('./node');
+
+		const Graph = {};
+
 		;(function(){
 			Graph.is = function(g, cb, fn, as){ // checks to see if an object is a valid graph.
 				if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
@@ -624,7 +629,7 @@
 				this.obj[k] = this.opt.seen[tmp] = Graph.to(this.graph, tmp, this.opt);
 			}
 		}());
-		var fn_is = Type.fn.is;
+		// var fn_is = Type.fn.is; // dead code
 		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
 		var u;
 
@@ -634,9 +639,9 @@
 
 	// ---
 
+	// request / response module, for asking and acking messages.
 	USE('./ask', function(module){
-		// request / response module, for asking and acking messages.
-		USE('./onto'); // depends upon onto!
+
 		module.exports = function ask(cb, as){
 			if(!this.on){ return }
 			if(!(cb instanceof Function)){
@@ -662,7 +667,8 @@
 	// ---
 
 	USE('./dup', function(module){
-		var Type = USE('./type');
+		const Type = USE('./type');
+
 		function Dup(opt){
 			var dup = {s:{}};
 			opt = opt || {max: 1000, age: 1000 * 9};//1000 * 60 * 2};
@@ -698,54 +704,61 @@
 	// ---
 
 	USE('./gun', function(module){
+		var Type = USE('./type');
+		const HAM = USE('./HAM');
+		const val = USE('./val');
+		const node = USE('./node');
 
-		module.exports = function Gun(o){
+		function Gun(o){
 			if(o instanceof Gun){ return (this._ = {gun: this, $: this}).$ }
 			if(!(this instanceof Gun)){ return new Gun(o) }
 			return Gun.create(this._ = {gun: this, $: this, opt: o});
 		}
+		Gun.version = 0.9;
+		Gun.chain = Gun.prototype;
+
+		Type.obj.to(Type, Gun);
+		Object.assign(Gun, {
+			HAM,
+			val,
+			node,
+		});
+
+		module.exports = Gun;
 
 	}).END();
 
 	// ---
 
 	USE('./root', function(module){
-
 		const Gun = USE('./gun');
+		const chain = USE('./chain');
+		const back = USE('./back');
+		const get = USE('./get');
+		const put = USE('./put');
+		const on = USE('./on').on;
+		const once = USE('./on').once;
+		const off = USE('./on').off;
+		const map = USE('./map');
+		const set = USE('./set');
+		const state = USE('./state');
+		const graph = USE('./graph');
+		const onto = USE('./onto');
+		const ask = USE('./ask');
+		const dup = USE('./dup');
+
+		Object.assign(Gun, { on: onto, state, graph, ask, dup });
+		Object.assign(Gun.prototype, { chain, back, get, put, on, once, off, map, set });
+
+		Gun.chain.toJSON = function(){};
+		Gun.is = function ($) { return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
+
 		module.exports = Gun;
 
-		Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
-
-		Gun.version = 0.9;
-
-		var Type = USE('./type');
-		Type.obj.to(Type, Gun);
-
-		Gun.HAM = USE('./HAM');
-		Gun.val = USE('./val');
-		Gun.node = USE('./node');
-
-		Gun.chain = Gun.prototype;
-		Gun.chain.toJSON = function(){};
-		Gun.chain.chain = USE('./chain');
-		Gun.chain.back = USE('./back');
-		Gun.chain.get = USE('./get');
-		Gun.chain.put = USE('./put');
-		Gun.chain.on = USE('./on').on;
-		Gun.chain.once = USE('./on').once;
-		Gun.chain.off = USE('./on').off;
-		Gun.chain.map = USE('./map');
-		Gun.chain.set = USE('./set');
 		Gun.chain.val = function(cb, opt){
 			Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
 			return Gun.once(cb, opt);
 		}
-
-		Gun.state = USE('./state');
-		Gun.graph = USE('./graph');
-		Gun.on = USE('./onto');
-		Gun.ask = USE('./ask');
-		Gun.dup = USE('./dup');
 
 		;(function(){
 			Gun.create = function(at){
@@ -1008,10 +1021,10 @@
 	// ---
 
 	USE('./chain', function(module){
+		var Gun = USE('./gun');
 		// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 		// is complicated and was extremely hard to build. If you port GUN to another
 		// language, consider implementing an easier API to build.
-		var Gun = USE('./gun');
 
 		module.exports = function chain(sub){
 			var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
@@ -1310,6 +1323,7 @@
 
 	USE('./get', function(module){
 		var Gun = USE('./gun');
+
 		module.exports = function(key, cb, as){
 			var gun, tmp;
 			if(typeof key === 'string'){
@@ -1689,6 +1703,7 @@
 
 	USE('./on', function(module){
 		var Gun = USE('./gun');
+
 		module.exports.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
 			if(typeof tag === 'string'){
@@ -1709,7 +1724,7 @@
 		}
 
 		function ok(msg, ev){ var opt = this;
-			var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, cat = opt.at, tmp;
+			var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, tmp; // cat = opt.at // cat is not used
 			if(u === data){
 				return;
 			}
@@ -1830,6 +1845,7 @@
 
 	USE('./map', function(module){
 		var Gun = USE('./gun');
+
 		module.exports = function(cb, opt, t){
 			var gun = this, cat = gun._, chain;
 			if(!cb){
@@ -1870,6 +1886,7 @@
 
 	USE('./set', function(module){
 		var Gun = USE('./gun');
+
 		module.exports = function(item, cb, opt){
 			var gun = this, soul;
 			cb = cb || function(){};
@@ -1895,7 +1912,7 @@
 	USE('./adapters/localStorage', function(module){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
-		var root, noop = function(){}, store, u;
+		var noop = function(){}, store, u;
 		try{store = (Gun.window||noop).localStorage}catch(e){}
 		if(!store){
 			console.log("Warning: No localStorage exists to persist data to!");
@@ -2043,7 +2060,7 @@
 	// ---
 
 	USE('./adapters/mesh', function(module){
-		var Type = USE('./type');
+		const Type = USE('./type');
 
 		function Mesh(root){
 			var mesh = function(){};
@@ -2291,7 +2308,8 @@
 			}
 		}());
 
-	  var empty = {}, ok = true, u;
+		var ok = true, u;
+		// var empty = {},
 
 	  module.exports = Mesh;
 
@@ -2300,9 +2318,10 @@
 	// ---
 
 	USE('./adapters/websocket', function(module){
-		var Gun = USE('./gun');
-		Gun.Mesh = USE('./adapters/mesh');
+		const Gun = USE('./gun');
+		const Mesh = USE('./adapters/mesh');
 
+		Gun.Mesh = Mesh;
 		Gun.on('opt', function(root){
 			this.to.next(root);
 			var opt = root.opt;
@@ -2320,7 +2339,7 @@
 
 			var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
 
-			var wire = mesh.wire || opt.wire;
+			// var wire = mesh.wire || opt.wire;
 			mesh.wire = opt.wire = open;
 			function open(peer){ try{
 				if(!peer || !peer.url){ return wire && wire(peer) }
@@ -2354,7 +2373,7 @@
 			}
 			var doc = 'undefined' !== typeof document && document;
 		});
-		var noop = function(){};
+		// var noop = function(){};
 
 	}).END();
 
