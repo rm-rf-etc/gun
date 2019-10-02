@@ -1,22 +1,25 @@
 ;(function(){
 
 	/* UNBUILD */
-	let root;
-	if(typeof window !== "undefined"){ root = window }
-	if(typeof global !== "undefined"){ root = global }
-	root = root || {};
-	let console = root.console || {log: function(){}};
 
-	const modules = {};
-	const exported = {};
-	const USE = (name, fn) => {
+	var root;
+	if (typeof window !== "undefined"){ root = window }
+	if (typeof global !== "undefined"){ root = global }
+	root = root || {};
+	var console = root.console || {log: function(){}};
+
+	var modules = {};
+	var exported = {};
+	var USE = (name, fn) => {
 		if (name && fn) {
-			const END = () => {
+			var END = () => {
 				// console.log('DECLARE MODULE:', name);
 				modules[name] = function(){
 					const mod = { exports: {} };
-					fn(mod);
+					const exp = {};
+					fn(mod, exp);
 					exported[name] = mod.exports;
+					Object.keys(exp).forEach((key) => (exported[name][key] = exp[key]));
 				}
 				return;
 			};
@@ -30,9 +33,8 @@
 	};
 
 	if(typeof module !== "undefined"){ var common = module }
-	/* UNBUILD */
 
-	// ---
+	/* UNBUILD */
 
 	USE('./type', function(module){
 		// Generic javascript utilities.
@@ -736,9 +738,7 @@
 		const back = USE('./back');
 		const get = USE('./get');
 		const put = USE('./put');
-		const on = USE('./on').on;
-		const once = USE('./on').once;
-		const off = USE('./on').off;
+		const { on, once, off } = USE('./on');
 		const map = USE('./map');
 		const set = USE('./set');
 		const state = USE('./state');
@@ -969,17 +969,13 @@
 				},1);
 			});
 		});*/
-
-		modules['./adapters/localStorage']();
-		modules['./adapters/mesh']();
-		modules['./adapters/websocket']();
 	}).END();
 
 	// ---
 
 	USE('./back', function(module){
-		// var Gun = USE('./root');
-		module.exports = function(n, opt){ var tmp;
+		module.exports = function(n, opt){
+			var tmp;
 			n = n || 1;
 			if(-1 === n || Infinity === n){
 				return this._.root.$;
@@ -1467,6 +1463,7 @@
 
 	USE('./put', function(module){
 		var Gun = USE('./gun');
+
 		module.exports = function(data, cb, as){
 			// #soul.has=value>state
 			// ~who#where.where=what>when@was
@@ -1701,10 +1698,10 @@
 
 	// ---
 
-	USE('./on', function(module){
+	USE('./on', function(_, exports){
 		var Gun = USE('./gun');
 
-		module.exports.on = function(tag, arg, eas, as){
+		exports.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
 			if(typeof tag === 'string'){
 				if(!arg){ return at.on(tag) }
@@ -1751,7 +1748,7 @@
 			}
 		}
 
-		module.exports.once = function(cb, opt){
+		exports.once = function(cb, opt){
 			var gun = this, at = gun._, data = at.put;
 			if(0 < at.ack && u !== data){
 				(cb || noop).call(gun, data, at.get);
@@ -1798,7 +1795,7 @@
 			opt.ok.call(gun || opt.$, data, msg.get);
 		}
 
-		module.exports.off = function(){
+		exports.off = function(){
 			// make off more aggressive. Warning, it might backfire!
 			var gun = this, at = gun._, tmp;
 			var cat = at.back;
@@ -1909,7 +1906,7 @@
 
 	// ---
 
-	USE('./adapters/localStorage', function(module){
+	USE('./adapters/localStorage', function(){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
 		var noop = function(){}, store, u;
@@ -2311,13 +2308,13 @@
 		var ok = true, u;
 		// var empty = {},
 
-	  module.exports = Mesh;
+		module.exports = Mesh;
 
 	}).END();
 
 	// ---
 
-	USE('./adapters/websocket', function(module){
+	USE('./adapters/websocket', function(){
 		const Gun = USE('./gun');
 		const Mesh = USE('./adapters/mesh');
 
@@ -2377,5 +2374,13 @@
 
 	}).END();
 
-	modules['./root']();
+	// ---
+
+	USE('./index', function(){
+		USE('./root');
+		USE('./adapters/localStorage');
+		USE('./adapters/mesh');
+		USE('./adapters/websocket');
+	}).END();
+
 }());
