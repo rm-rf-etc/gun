@@ -1,23 +1,17 @@
 ;(function(){
 
 	/* UNBUILD */
-	let root;
-	if(typeof window !== "undefined"){ root = window }
-	if(typeof global !== "undefined"){ root = global }
-	root = root || {};
-	let console = root.console || {log: function(){}};
 
-	const modules = {};
-	const exported = {};
-	function USE(name, fn){
+	var root;
+	if (typeof window !== "undefined"){ root = window }
+	if (typeof global !== "undefined"){ root = global }
+	root = root || {};
+	var console = root.console || {log: function(){}};
+
+	var modules = {};
+	var exported = {};
+	var USE = (name, fn) => {
 		if (name && fn) {
-			// // console.log('DECLARE MODULE:', name);
-			// modules[name] = function(){
-			// 	const mod = { exports: {} };
-			// 	fn(mod);
-			// 	exported[name] = mod.exports;
-			// }
-			// return;
 			var END = () => {
 				// console.log('DECLARE MODULE:', name);
 				modules[name] = function(){
@@ -281,8 +275,9 @@
 	// ---
 
 	USE('./val', function(module){
-		var Type = USE('./type');
-		var Val = {};
+		const Type = USE('./type');
+
+		const Val = {};
 		Val.is = function(v){ // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
 			if(v === u){ return false }
 			if(v === null){ return true } // "deletes", nulling out keys.
@@ -329,9 +324,10 @@
 	// ---
 
 	USE('./node', function(module){
-		var Type = USE('./type');
-		var Val = USE('./val');
-		var Node = {_: '_'};
+		const Type = USE('./type');
+		const Val = USE('./val');
+
+		const Node = {_: '_'};
 		Node.soul = function(n, o){ return (n && n._ && n._[o || soul_]) } // convenience function to check to see if there is a soul on a node and return it.
 		Node.soul.ify = function(n, o){ // put a soul on an object.
 			o = (typeof o === 'string')? {soul: o} : o || {};
@@ -380,10 +376,10 @@
 				}
 			}
 		}());
-		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
-		var text = Type.text, text_random = text.random;
-		var soul_ = Node.soul._;
-		var u;
+		const obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
+		const text = Type.text, text_random = text.random;
+		const soul_ = Node.soul._;
+		let u;
 
 		module.exports = Node;
 	}).END();
