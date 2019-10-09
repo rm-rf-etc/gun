@@ -268,11 +268,11 @@
 
 	USE('./sha1', function(module){
 		// This internal func returns SHA-1 hashed data for KeyID generation
-		const __shim = USE('./shim')
-		const subtle = __shim.subtle
-		const ossl = __shim.ossl ? __shim.ossl : subtle
-		const sha1hash = (b) => ossl.digest({name: 'SHA-1'}, new ArrayBuffer(b))
-		module.exports = sha1hash
+		const shim = USE('./shim');
+		const subtle = shim.subtle;
+		const ossl = shim.ossl ? shim.ossl : subtle;
+		const sha1hash = (b) => ossl.digest({name: 'SHA-1'}, new ArrayBuffer(b));
+		module.exports = sha1hash;
 	}).END();
 
 	USE('./work', function(module){
