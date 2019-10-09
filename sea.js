@@ -221,7 +221,7 @@
 
 	USE('./settings', function(module){
 		var SEA = USE('./root');
-		var Buffer = USE('./buffer');
+		// var Buffer = USE('./buffer');
 		var s = {};
 		s.pbkdf2 = {hash: 'SHA-256', iter: 100000, ks: 64};
 		s.ecdsa = {
@@ -254,7 +254,7 @@
 		}
 
 		SEA.opt = s;
-		module.exports = s
+		module.exports = s;
 	}).END();
 
 	USE('./sha256', function(module){
