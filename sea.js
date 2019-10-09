@@ -1,24 +1,46 @@
 ;(function(){
 
 	/* UNBUILD */
+
 	var root;
-	if(typeof window !== "undefined"){ root = window }
-	if(typeof global !== "undefined"){ root = global }
+	if (typeof window !== "undefined") { root = window }
+	if (typeof global !== "undefined") { root = global }
 	root = root || {};
-	var console = root.console || {log: function(){}};
-	function USE(arg, req){
-		return req? require(arg) : arg.slice? USE[R(arg)] : function(mod, path){
-			arg(mod = {exports: {}});
-			USE[R(path)] = mod.exports;
+	var console = root.console || { log: function () { } };
+
+	var modules = {};
+	var exported = {};
+	function USE(name, fn) {
+		if (name === './gun') {
+			exported[name] = require(name);
+			return;
 		}
-		function R(p){
-			return p.split('/').slice(-1).toString().replace('.js','');
+		if (name && fn) {
+			var END = () => {
+				// console.log('DECLARE MODULE:', name);
+				modules[name] = function () {
+					const mod = { exports: {} };
+					const exp = {};
+					fn(mod, exp);
+					exported[name] = mod.exports;
+					Object.keys(exp).forEach((key) => (exported[name][key] = exp[key]));
+				}
+				return;
+			};
+			return { END };
 		}
-	}
-	if(typeof module !== "undefined"){ var common = module }
+		if (!exported[name]) {
+			// console.log('USE MODULE:', name);
+			modules[name]();
+		}
+		return exported[name];
+	};
+
+	if (typeof module !== "undefined") { var common = module }
+
 	/* UNBUILD */
 
-	;USE(function(module){
+	USE('./root', function(module){
 		// Security, Encryption, and Authorization: SEA.js
 		// MANDATORY READING: https://gun.eco/explainers/data/security.html
 		// IT IS IMPLEMENTED IN A POLYFILL/SHIM APPROACH.
@@ -33,9 +55,9 @@
 
 		try{ if(typeof common !== "undefined"){ common.exports = SEA } }catch(e){}
 		module.exports = SEA;
-	})(USE, './root');
+	}).END();
 
-	;USE(function(module){
+	USE('./https', function(module){
 		var SEA = USE('./root');
 		try{ if(SEA.window){
 			if(location.protocol.indexOf('s') < 0
@@ -44,17 +66,17 @@
 				location.protocol = 'https:'; // WebCrypto does NOT work without HTTPS!
 			}
 		} }catch(e){}
-	})(USE, './https');
+	}).END();
 
-	;USE(function(module){
+	USE('./base64', function(module){
 		if(typeof global !== "undefined"){
 			var g = global;
 			g.btoa = function (data) { return Buffer.from(data, "binary").toString("base64"); };
 			g.atob = function (data) { return Buffer.from(data, "base64").toString("binary"); };
 		}
-	})(USE, './base64');
+	}).END();
 
-	;USE(function(module){
+	USE('./array', function(module){
 		USE('./base64');
 		// This is Array extended to have .toString(['utf8'|'hex'|'base64'])
 		function SeaArray() {}
@@ -78,9 +100,9 @@
 			}
 		}
 		module.exports = SeaArray;
-	})(USE, './array');
+	}).END();
 
-	;USE(function(module){
+	USE('./buffer', function(module){
 		USE('./base64');
 		// This is Buffer implementation used in SEA. Functionality is mostly
 		// compatible with NodeJS 'safe-buffer' and is used for encoding conversions
@@ -158,9 +180,9 @@
 		SafeBuffer.prototype.toString = SeaArray.prototype.toString
 
 		module.exports = SafeBuffer;
-	})(USE, './buffer');
+	}).END();
 
-	;USE(function(module){
+	USE('./shim', function(module){
 		const SEA = USE('./root')
 		const Buffer = USE('./buffer')
 		const api = {Buffer: Buffer}
@@ -195,9 +217,9 @@
 		}}
 
 		module.exports = api
-	})(USE, './shim');
+	}).END();
 
-	;USE(function(module){
+	USE('./settings', function(module){
 		var SEA = USE('./root');
 		var Buffer = USE('./buffer');
 		var s = {};
@@ -233,27 +255,27 @@
 
 		SEA.opt = s;
 		module.exports = s
-	})(USE, './settings');
+	}).END();
 
-	;USE(function(module){
+	USE('./sha256', function(module){
 		var shim = USE('./shim');
 		module.exports = async function(d, o){
 			var t = (typeof d == 'string')? d : JSON.stringify(d);
 			var hash = await shim.subtle.digest({name: o||'SHA-256'}, new shim.TextEncoder().encode(t));
 			return shim.Buffer.from(hash);
 		}
-	})(USE, './sha256');
+	}).END();
 
-	;USE(function(module){
+	USE('./sha1', function(module){
 		// This internal func returns SHA-1 hashed data for KeyID generation
 		const __shim = USE('./shim')
 		const subtle = __shim.subtle
 		const ossl = __shim.ossl ? __shim.ossl : subtle
 		const sha1hash = (b) => ossl.digest({name: 'SHA-1'}, new ArrayBuffer(b))
 		module.exports = sha1hash
-	})(USE, './sha1');
+	}).END();
 
-	;USE(function(module){
+	USE('./work', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -294,9 +316,9 @@
 		}});
 
 		module.exports = SEA.work;
-	})(USE, './work');
+	}).END();
 
-	;USE(function(module){
+	USE('./pair', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -368,9 +390,9 @@
 		}});
 
 		module.exports = SEA.pair;
-	})(USE, './pair');
+	}).END();
 
-	;USE(function(module){
+	USE('./sign', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -412,9 +434,9 @@
 		}});
 
 		module.exports = SEA.sign;
-	})(USE, './sign');
+	}).END();
 
-	;USE(function(module){
+	USE('./verify', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -488,9 +510,9 @@
 		}
 		SEA.opt.fallback = 2;
 
-	})(USE, './verify');
+	}).END();
 
-	;USE(function(module){
+	USE('./aeskey', function(module){
 		var shim = USE('./shim');
 		var sha256hash = USE('./sha256');
 
@@ -502,9 +524,9 @@
 			return await shim.subtle.importKey('raw', new Uint8Array(hash), opt.name || 'AES-GCM', false, ['encrypt', 'decrypt'])
 		}
 		module.exports = importGen;
-	})(USE, './aeskey');
+	}).END();
 
-	;USE(function(module){
+	USE('./encrypt', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -542,9 +564,9 @@
 		}});
 
 		module.exports = SEA.encrypt;
-	})(USE, './encrypt');
+	}).END();
 
-	;USE(function(module){
+	USE('./decrypt', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -584,9 +606,9 @@
 		}});
 
 		module.exports = SEA.decrypt;
-	})(USE, './decrypt');
+	}).END();
 
-	;USE(function(module){
+	USE('./secret', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
 		var S = USE('./settings');
@@ -635,9 +657,9 @@
 		}
 
 		module.exports = SEA.secret;
-	})(USE, './secret');
+	}).END();
 
-	;USE(function(module){
+	USE('./sea', function(module){
 		var shim = USE('./shim');
 		// Practical examples about usage found from ./test/common.js
 		var SEA = USE('./root');
@@ -646,6 +668,7 @@
 		SEA.verify = USE('./verify');
 		SEA.encrypt = USE('./encrypt');
 		SEA.decrypt = USE('./decrypt');
+		var Gun = USE('./gun');
 
 		SEA.random = SEA.random || shim.random;
 
@@ -687,14 +710,14 @@
 		// But all other behavior needs to be equally easy, like opinionated ways of
 		// Adding friends (trusted public keys), sending private messages, etc.
 		// Cheers! Tell me what you think.
-		var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'./gun', 1);
+		// var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'./gun', 1);
 		Gun.SEA = SEA;
 		SEA.GUN = SEA.Gun = Gun;
 
 		module.exports = SEA
-	})(USE, './sea');
+	}).END();
 
-	;USE(function(module){
+	USE('./then', function(module){
 		var Gun = USE('./sea').Gun;
 		Gun.chain.then = function(cb){
 			var gun = this, p = (new Promise(function(res, rej){
@@ -702,9 +725,9 @@
 			}));
 			return cb? p.then(cb) : p;
 		}
-	})(USE, './then');
+	}).END();
 
-	;USE(function(module){
+	USE('./user', function(module){
 		var SEA = USE('./sea');
 		var Gun = SEA.Gun;
 		var then = USE('./then');
@@ -734,9 +757,9 @@
 		}
 		Gun.User = User;
 		module.exports = User;
-	})(USE, './user');
+	}).END();
 
-	;USE(function(module){
+	USE('./create', function(module){
 		// TODO: This needs to be split into all separate functions.
 		// Not just everything thrown into 'create'.
 
@@ -1064,10 +1087,10 @@
 			return gun;
 		}
 		module.exports = User
-	})(USE, './create');
+	}).END();
 
-	;USE(function(module){
-		const SEA = USE('./sea')
+	USE('./index', function(module){
+		const SEA = USE('./sea');
 		const Gun = SEA.Gun;
 		// After we have a GUN extension to make user registration/login easy, we then need to handle everything else.
 
@@ -1170,7 +1193,7 @@
 						each.pub(val, key, node, soul, tmp, (msg._||noop).user); return;
 					}
 					each.any(val, key, node, soul, (msg._||noop).user); return;
-					return each.end({err: "No other data allowed!"});
+					// return each.end({err: "No other data allowed!"});
 				};
 				each.alias = function(val, key, node, soul){ // Example: {_:#~@, ~@alice: {#~@alice}}
 					if(!val){ return each.end({err: "Data must exist!"}) } // data MUST exist
@@ -1312,5 +1335,7 @@
 		var rel_is = Gun.val.rel.is;
 		// TODO: Potential bug? If pub/priv key starts with `-`? IDK how possible.
 
-	})(USE, './index');
+	}).END();
+
+	USE('./root');
 }());
