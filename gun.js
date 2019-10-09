@@ -10,7 +10,7 @@
 
 	var modules = {};
 	var exported = {};
-	var USE = (name, fn) => {
+	function USE(name, fn) {
 		if (name && fn) {
 			var END = () => {
 				// console.log('DECLARE MODULE:', name);
