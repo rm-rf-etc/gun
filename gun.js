@@ -968,7 +968,6 @@
 	// ---
 
 	USE('./back', function(module){
-		// var Gun = USE('./root');
 		module.exports = function(n, opt){
 			var tmp;
 			n = n || 1;
@@ -1688,7 +1687,7 @@
 
 	// ---
 
-	USE('./on', function (_, exports) {
+	USE('./on', function(_, exports){
 		var Gun = USE('./gun');
 		exports.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
@@ -1893,7 +1892,7 @@
 	USE('./adapters/localStorage', function(module){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
-		var root, noop = function(){}, store, u;
+		var noop = function(){}, store, u;
 		try{store = (Gun.window||noop).localStorage}catch(e){}
 		if(!store){
 			console.log("Warning: No localStorage exists to persist data to!");
@@ -2288,7 +2287,7 @@
 			}
 		}());
 
-	  var empty = {}, ok = true, u;
+	  var ok = true, u;
 
 	  module.exports = Mesh;
 	}).END();
