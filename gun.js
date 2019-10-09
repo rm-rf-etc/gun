@@ -634,8 +634,9 @@
 	// ---
 
 	USE('./ask', function(module){
+		// USE('./onto'); // depends upon onto!
+
 		// request / response module, for asking and acking messages.
-		USE('./onto'); // depends upon onto!
 		module.exports = function ask(cb, as){
 			if(!this.on){ return }
 			if(!(cb instanceof Function)){
