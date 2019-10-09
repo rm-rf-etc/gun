@@ -2350,7 +2350,6 @@
 			}
 			var doc = 'undefined' !== typeof document && document;
 		});
-		var noop = function(){};
 	}).END();
 
 	modules['./root']();
