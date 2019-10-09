@@ -2122,7 +2122,7 @@
 						return;
 					}
 					if(!peer.wire && mesh.wire){ mesh.wire(peer) }
-					if(id === peer.last){ return } peer.last = id;  // was it just sent?
+					if(id === peer.last){ return } peer.last = id; // was it just sent?
 					if(peer === meta.via){ return false }
 					if((tmp = meta.to) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
 					if(peer.batch){
@@ -2257,16 +2257,18 @@
 
 		;(function(){
 			Type.text.hash = function(s){ // via SO
-				if(typeof s !== 'string'){ return {err: 1} }
-			var c = 0;
-			if(!s.length){ return c }
-			for(var i=0,l=s.length,n; i<l; ++i){
-			  n = s.charCodeAt(i);
-			  c = ((c<<5)-c)+n;
-			  c |= 0;
+				if(typeof s !== 'string'){
+					return { err: 1 };
+				}
+				var c = 0;
+				if(!s.length){ return c }
+				for(var i=0,l=s.length,n; i<l; ++i){
+					n = s.charCodeAt(i);
+					c = ((c<<5)-c)+n;
+					c |= 0;
+				}
+				return c; // Math.abs(c);
 			}
-			return c; // Math.abs(c);
-		  }
 
 			var $ = JSON.stringify, u;
 
@@ -2287,9 +2289,9 @@
 			}
 		}());
 
-	  var ok = true, u;
+		var ok = true, u;
 
-	  module.exports = Mesh;
+		module.exports = Mesh;
 	}).END();
 
 	// ---
