@@ -391,7 +391,7 @@
 		const Node = USE('./node');
 
 		function State(){
-			var t;
+			let t;
 			/*if(perf){
 				t = start + perf.now(); // Danger: Accuracy decays significantly over time, even if precise.
 			} else {*/
@@ -475,10 +475,11 @@
 	// ---
 
 	USE('./graph', function(module){
-		var Type = USE('./type');
-		var Val = USE('./val');
-		var Node = USE('./node');
-		var Graph = {};
+		const Type = USE('./type');
+		const Val = USE('./val');
+		const Node = USE('./node');
+
+		const Graph = {};
 		;(function(){
 			Graph.is = function(g, cb, fn, as){ // checks to see if an object is a valid graph.
 				if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
