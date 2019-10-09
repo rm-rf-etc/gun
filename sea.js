@@ -480,13 +480,13 @@
 		module.exports = SEA.verify;
 		// legacy & ossl leak mitigation:
 
-		var knownKeys = {};
-		var keyForPair = SEA.opt.slow_leak = pair => {
-			if (knownKeys[pair]) return knownKeys[pair];
-			var jwk = S.jwk(pair);
-			knownKeys[pair] = (shim.ossl || shim.subtle).importKey("jwk", jwk, S.ecdsa.pair, false, ["verify"]);
-			return knownKeys[pair];
-		};
+		// var knownKeys = {};
+		// var keyForPair = SEA.opt.slow_leak = pair => {
+		// 	if (knownKeys[pair]) return knownKeys[pair];
+		// 	var jwk = S.jwk(pair);
+		// 	knownKeys[pair] = (shim.ossl || shim.subtle).importKey("jwk", jwk, S.ecdsa.pair, false, ["verify"]);
+		// 	return knownKeys[pair];
+		// };
 
 
 		SEA.opt.fall_verify = async function(data, pair, cb, opt, f){
