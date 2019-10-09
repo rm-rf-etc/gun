@@ -699,11 +699,30 @@
 
 	USE('./gun', function(module){
 
-		module.exports = function Gun(o){
+		var Type = USE('./type');
+		const HAM = USE('./HAM');
+		const val = USE('./val');
+		const node = USE('./node');
+
+		function Gun(o){
 			if(o instanceof Gun){ return (this._ = {gun: this, $: this}).$ }
 			if(!(this instanceof Gun)){ return new Gun(o) }
 			return Gun.create(this._ = {gun: this, $: this, opt: o});
-		}
+		};
+		module.exports = Gun;
+
+		Gun.version = 0.9;
+		Gun.chain = Gun.prototype;
+
+		Type.obj.to(Type, Gun);
+		Object.assign(Gun, {
+			HAM,
+			val,
+			node,
+		});
+
+		module.exports = Gun;
+
 	}).END();
 
 	// ---
@@ -711,40 +730,31 @@
 	USE('./root', function(module){
 
 		const Gun = USE('./gun');
+		const chain = USE('./chain');
+		const back = USE('./back');
+		const get = USE('./get');
+		const put = USE('./put');
+		const { on, once, off } = USE('./on');
+		const map = USE('./map');
+		const set = USE('./set');
+		const state = USE('./state');
+		const graph = USE('./graph');
+		const onto = USE('./onto');
+		const ask = USE('./ask');
+		const dup = USE('./dup');
+
+		Object.assign(Gun, { on: onto, state, graph, ask, dup });
+		Object.assign(Gun.prototype, { chain, back, get, put, on, once, off, map, set });
+
+		Gun.chain.toJSON = function(){};
+		Gun.is = function ($) { return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
+
 		module.exports = Gun;
 
-		Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
-
-		Gun.version = 0.9;
-
-		var Type = USE('./type');
-		Type.obj.to(Type, Gun);
-
-		Gun.HAM = USE('./HAM');
-		Gun.val = USE('./val');
-		Gun.node = USE('./node');
-
-		Gun.chain = Gun.prototype;
-		Gun.chain.toJSON = function(){};
-		Gun.chain.chain = USE('./chain');
-		Gun.chain.back = USE('./back');
-		Gun.chain.get = USE('./get');
-		Gun.chain.put = USE('./put');
-		Gun.chain.on = USE('./on').on;
-		Gun.chain.once = USE('./on').once;
-		Gun.chain.off = USE('./on').off;
-		Gun.chain.map = USE('./map');
-		Gun.chain.set = USE('./set');
 		Gun.chain.val = function(cb, opt){
 			Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
 			return Gun.once(cb, opt);
 		}
-
-		Gun.state = USE('./state');
-		Gun.graph = USE('./graph');
-		Gun.on = USE('./onto');
-		Gun.ask = USE('./ask');
-		Gun.dup = USE('./dup');
 
 		;(function(){
 			Gun.create = function(at){
@@ -955,10 +965,6 @@
 				},1);
 			});
 		});*/
-
-		modules['./adapters/localStorage']();
-		modules['./adapters/mesh']();
-		modules['./adapters/websocket']();
 	}).END();
 
 	// ---
@@ -1007,10 +1013,10 @@
 	// ---
 
 	USE('./chain', function(module){
+		var Gun = USE('./gun');
 		// WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 		// is complicated and was extremely hard to build. If you port GUN to another
 		// language, consider implementing an easier API to build.
-		var Gun = USE('./gun');
 
 		module.exports = function chain(sub){
 			var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
