@@ -2354,5 +2354,14 @@
 		});
 	}).END();
 
-	modules['./root']();
+	// ---
+
+	USE('./index', function(){
+		USE('./root');
+		USE('./adapters/localStorage');
+		USE('./adapters/mesh');
+		USE('./adapters/websocket');
+	}).END();
+
+	USE('./index');
 }());
