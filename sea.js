@@ -714,11 +714,11 @@
 		Gun.SEA = SEA;
 		SEA.GUN = SEA.Gun = Gun;
 
-		module.exports = SEA
+		module.exports = SEA;
 	}).END();
 
 	USE('./then', function(module){
-		var Gun = USE('./sea').Gun;
+		var { Gun } = USE('./sea');
 		Gun.chain.then = function(cb){
 			var gun = this, p = (new Promise(function(res, rej){
 				gun.once(res);
@@ -728,8 +728,8 @@
 	}).END();
 
 	USE('./user', function(module){
-		var SEA = USE('./sea');
-		var Gun = SEA.Gun;
+		var { Gun } = USE('./sea');
+		// var Gun = SEA.Gun;
 		var then = USE('./then');
 
 		function User(root){
@@ -765,7 +765,6 @@
 
 		var SEA = USE('./sea');
 		var User = USE('./user');
-		var authsettings = USE('./settings');
 		var Gun = SEA.Gun;
 
 		var noop = function(){};
