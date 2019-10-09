@@ -529,7 +529,6 @@
 	USE('./encrypt', function(module){
 		var SEA = USE('./root');
 		var shim = USE('./shim');
-		var S = USE('./settings');
 		var aeskey = USE('./aeskey');
 		var u;
 
