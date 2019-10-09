@@ -625,7 +625,6 @@
 				this.obj[k] = this.opt.seen[tmp] = Graph.to(this.graph, tmp, this.opt);
 			}
 		}());
-		var fn_is = Type.fn.is;
 		var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
 		var u;
 
