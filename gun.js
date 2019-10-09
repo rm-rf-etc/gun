@@ -1688,7 +1688,6 @@
 
 	// ---
 
-	// USE('./on', function(module){
 	USE('./on', function (_, exports) {
 		var Gun = USE('./gun');
 		exports.on = function(tag, arg, eas, as){
@@ -1711,7 +1710,7 @@
 		}
 
 		function ok(msg, ev){ var opt = this;
-			var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, cat = opt.at, tmp;
+			var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, tmp;
 			if(u === data){
 				return;
 			}
@@ -1763,7 +1762,7 @@
 
 		function val(msg, eve, to){
 			if(!msg.$){ eve.off(); return }
-			var opt = this.as, cat = opt.at, gun = msg.$, at = gun._, data = at.put || msg.put, link, tmp;
+			var opt = this.as, gun = msg.$, at = gun._, data = at.put || msg.put, link, tmp;
 			if(tmp = msg.$$){
 				link = tmp = (msg.$$._);
 				if(u !== link.put){
