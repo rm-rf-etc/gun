@@ -195,7 +195,7 @@
 		}
 		if(!api.crypto){try{
 			var crypto = USE('crypto', 1);
-			const { TextEncoder, TextDecoder } = USE('text-encoding', 1)
+			const { TextEncoder, TextDecoder } = USE('text-encoding', 1);
 			Object.assign(api, {
 				crypto,
 				//subtle,
@@ -659,12 +659,18 @@
 		var shim = USE('./shim');
 		// Practical examples about usage found from ./test/common.js
 		var SEA = USE('./root');
-		SEA.work = USE('./work');
-		SEA.sign = USE('./sign');
-		SEA.verify = USE('./verify');
-		SEA.encrypt = USE('./encrypt');
-		SEA.decrypt = USE('./decrypt');
+		var work = USE('./work');
+		var sign = USE('./sign');
+		var verify = USE('./verify');
+		var encrypt = USE('./encrypt');
+		var decrypt = USE('./decrypt');
 		var Gun = USE('./gun');
+
+		SEA.work = work;
+		SEA.sign = sign;
+		SEA.verify = verify;
+		SEA.encrypt = encrypt;
+		SEA.decrypt = decrypt;
 
 		SEA.random = SEA.random || shim.random;
 
@@ -1325,7 +1331,6 @@
 		SEA.opt.shuffle_attack = 1546329600000; // Jan 1, 2019
 		var noop = function(){}, u;
 		var fl = Math.floor; // TODO: Still need to fix inconsistent state issue.
-		var rel_is = Gun.val.rel.is;
 		// TODO: Potential bug? If pub/priv key starts with `-`? IDK how possible.
 
 	}).END();
