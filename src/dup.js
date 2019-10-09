@@ -1,5 +1,4 @@
-
-var Type = require('./type');
+import Type from './type';
 function Dup(opt){
 	var dup = {s:{}};
 	opt = opt || {max: 1000, age: 1000 * 9};//1000 * 60 * 2};
@@ -27,5 +26,5 @@ function Dup(opt){
 	return dup;
 }
 var time_is = Type.time.is;
-module.exports = Dup;
-	
+
+export default Dup;

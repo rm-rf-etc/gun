@@ -1,5 +1,4 @@
-
-var Type = require('../type');
+import Type from './type';
 
 function Mesh(root){
 	var mesh = function(){};
@@ -19,9 +18,11 @@ function Mesh(root){
 			try{msg = JSON.parse(raw);}catch(e){opt.log('DAM JSON parse error', e)}
 			if(!msg){ return }
 			var i = 0, m;
+			var S = +new Date; // STATS!
 			while(m = msg[i++]){
 				mesh.hear(m, peer);
 			}
+			(mesh.hear.long || (mesh.hear.long = [])).push(+new Date - S);
 			return;
 		}
 		if('{' === tmp || (Type.obj.is(raw) && (msg = raw))){
@@ -80,7 +81,7 @@ function Mesh(root){
 				return;
 			}
 			if(!peer.wire && mesh.wire){ mesh.wire(peer) }
-			if(id === peer.last){ return } peer.last = id;  // was it just sent?
+			if(id === peer.last){ return } peer.last = id; // was it just sent?
 			if(peer === meta.via){ return false }
 			if((tmp = meta.to) && (tmp[peer.url] || tmp[peer.pid] || tmp[peer.id]) /*&& !o*/){ return false }
 			if(peer.batch){
@@ -107,7 +108,7 @@ function Mesh(root){
 		}
 		mesh.say.c = mesh.say.d = 0;
 	}());
-	
+
 	// for now - find better place later.
 	function send(raw, peer){ try{
 		var wire = peer.wire;
@@ -176,7 +177,7 @@ function Mesh(root){
 			Type.obj.map(tmp, function(msg){
 				mesh.say(msg, peer);
 			}); */
-			// @rogowski 2: I think with my PID fix we can delete this and use the original. 
+			// @rogowski 2: I think with my PID fix we can delete this and use the original.
 			return;
 		}
 		if(peer.pid){ return }
@@ -190,7 +191,7 @@ function Mesh(root){
 	});
 
 	root.on('bye', function(peer, tmp){
-		peer = opt.peers[peer.id || peer] || peer; 
+		peer = opt.peers[peer.id || peer] || peer;
 		this.to.next(peer);
 		peer.bye? peer.bye() : (tmp = peer.wire) && tmp.close && tmp.close();
 		Type.obj.del(opt.peers, peer.id);
@@ -215,17 +216,19 @@ function Mesh(root){
 
 ;(function(){
 	Type.text.hash = function(s){ // via SO
-		if(typeof s !== 'string'){ return {err: 1} }
-    var c = 0;
-    if(!s.length){ return c }
-    for(var i=0,l=s.length,n; i<l; ++i){
-      n = s.charCodeAt(i);
-      c = ((c<<5)-c)+n;
-      c |= 0;
-    }
-    return c; // Math.abs(c);
-  }
-	
+		if(typeof s !== 'string'){
+			return { err: 1 };
+		}
+		var c = 0;
+		if(!s.length){ return c }
+		for(var i=0,l=s.length,n; i<l; ++i){
+			n = s.charCodeAt(i);
+			c = ((c<<5)-c)+n;
+			c |= 0;
+		}
+		return c; // Math.abs(c);
+	}
+
 	var $ = JSON.stringify, u;
 
 	Type.obj.hash = function(obj, hash){
@@ -245,8 +248,6 @@ function Mesh(root){
 	}
 }());
 
-	  var empty = {}, ok = true, u;
+var ok = true, u;
 
-	  try{ module.exports = Mesh }catch(e){}
-
-	
+export default Mesh;

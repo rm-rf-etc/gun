@@ -1,8 +1,8 @@
+import Type from './type';
+import Node from './node';
 
-var Type = require('./type');
-var Node = require('./node');
 function State(){
-	var t;
+	let t;
 	/*if(perf){
 		t = start + perf.now(); // Danger: Accuracy decays significantly over time, even if precise.
 	} else {*/
@@ -79,5 +79,5 @@ var obj = Type.obj, obj_as = obj.as, obj_has = obj.has, obj_is = obj.is, obj_map
 var num = Type.num, num_is = num.is;
 var fn = Type.fn, fn_is = fn.is;
 var N_ = Node._, u;
-module.exports = State;
-	
+
+export default State;

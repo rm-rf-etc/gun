@@ -1,9 +1,9 @@
-
+import Gun from './gun';
 // WARNING: GUN is very simple, but the JavaScript chaining API around GUN
 // is complicated and was extremely hard to build. If you port GUN to another
 // language, consider implementing an easier API to build.
-var Gun = require('./root');
-Gun.chain.chain = function(sub){
+
+export default function chain(sub){
 	var gun = this, at = gun._, chain = new (sub || gun).constructor(gun), cat = chain._, root;
 	cat.root = root = at.root;
 	cat.id = ++root.once;
@@ -293,4 +293,3 @@ var empty = {}, u;
 var obj = Gun.obj, obj_has = obj.has, obj_put = obj.put, obj_del = obj.del, obj_to = obj.to, obj_map = obj.map;
 var text_rand = Gun.text.random;
 var _soul = Gun.val.link._, node_ = Gun.node._;
-	

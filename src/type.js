@@ -1,4 +1,3 @@
-
 // Generic javascript utilities.
 var Type = {};
 //Type.fns = Type.fn = {is: function(fn){ return (!!fn && fn instanceof Function) }}
@@ -137,5 +136,5 @@ Type.time.is = function(t){ return t? t instanceof Date : (+new Date().getTime()
 var fn_is = Type.fn.is;
 var list_is = Type.list.is;
 var obj = Type.obj, obj_is = obj.is, obj_has = obj.has, obj_map = obj.map;
-module.exports = Type;
-	
+
+export default Type;

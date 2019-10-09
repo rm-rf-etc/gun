@@ -1,6 +1,5 @@
-
-var Gun = require('./root');
-Gun.chain.back = function(n, opt){ var tmp;
+export default function(n, opt){
+	var tmp;
 	n = n || 1;
 	if(-1 === n || Infinity === n){
 		return this._.root.$;
@@ -37,4 +36,3 @@ Gun.chain.back = function(n, opt){ var tmp;
 	return this;
 }
 var empty = {}, u;
-	

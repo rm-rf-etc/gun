@@ -1,7 +1,7 @@
+// import './onto'; // depends upon onto!
 
 // request / response module, for asking and acking messages.
-require('./onto'); // depends upon onto!
-module.exports = function ask(cb, as){
+export default function ask(cb, as){
 	if(!this.on){ return }
 	if(!(cb instanceof Function)){
 		if(!cb || !as){ return }
@@ -20,4 +20,3 @@ module.exports = function ask(cb, as){
 	}, (this.opt||{}).lack || 9000);
 	return id;
 }
-	

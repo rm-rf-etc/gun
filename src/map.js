@@ -1,6 +1,5 @@
-
-var Gun = require('./index');
-Gun.chain.map = function(cb, opt, t){
+import Gun from './gun';
+export default function(cb, opt, t){
 	var gun = this, cat = gun._, chain;
 	if(!cb){
 		if(chain = cat.each){ return chain }
@@ -33,4 +32,3 @@ function each(v,k){
 	((tmp = gun.get(k)._).echo || (tmp.echo = {}))[cat.id] = tmp.echo[cat.id] || cat;
 }
 var obj_map = Gun.obj.map, noop = function(){}, event = {stun: noop, off: noop}, n_ = Gun.node._, u;
-	

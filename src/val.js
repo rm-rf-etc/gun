@@ -1,6 +1,6 @@
+import Type from './type';
 
-var Type = require('./type');
-var Val = {};
+const Val = {};
 Val.is = function(v){ // Valid values are a subset of JSON: null, binary, number (!Infinity), text, or a soul relation. Arrays need special algorithms to handle concurrency, so they are not supported directly. Use an extension that supports them if needed but research their problems first.
 	if(v === u){ return false }
 	if(v === null){ return true } // "deletes", nulling out keys.
@@ -40,5 +40,5 @@ var bi_is = Type.bi.is;
 var num_is = Type.num.is;
 var text_is = Type.text.is;
 var obj = Type.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
-module.exports = Val;
-	
+
+export default Val;

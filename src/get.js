@@ -1,6 +1,5 @@
-
-var Gun = require('./root');
-Gun.chain.get = function(key, cb, as){
+import Gun from './gun';
+export default function(key, cb, as){
 	var gun, tmp;
 	if(typeof key === 'string'){
 		var back = this, cat = back._;
@@ -131,10 +130,8 @@ function rid(at){
 	return;
 	//tmp.echo[cat.id] = {}; // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
 	//obj.del(map, at); // TODO: Warning: This unsubscribes ALL of this chain's listeners from this link, not just the one callback event.
-	return;
 }
 var obj = Gun.obj, obj_map = obj.map, obj_has = obj.has, obj_to = Gun.obj.to;
 var num_is = Gun.num.is;
 var rel = Gun.val.link, node_soul = Gun.node.soul, node_ = Gun.node._;
 var empty = {}, u;
-	

@@ -1,8 +1,8 @@
+import Type from './type';
+import Val from './val';
+import Node from './node';
 
-var Type = require('./type');
-var Val = require('./val');
-var Node = require('./node');
-var Graph = {};
+const Graph = {};
 ;(function(){
 	Graph.is = function(g, cb, fn, as){ // checks to see if an object is a valid graph.
 		if(!g || !obj_is(g) || obj_empty(g)){ return false } // must be an object.
@@ -148,8 +148,7 @@ Graph.node = function(node){
 		this.obj[k] = this.opt.seen[tmp] = Graph.to(this.graph, tmp, this.opt);
 	}
 }());
-var fn_is = Type.fn.is;
 var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_has = obj.has, obj_empty = obj.empty, obj_put = obj.put, obj_map = obj.map, obj_copy = obj.copy;
 var u;
-module.exports = Graph;
-	
+
+export default Graph;

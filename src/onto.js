@@ -1,6 +1,5 @@
-
 // On event emitter generic javascript utility.
-module.exports = function onto(tag, arg, as){
+export default function onto(tag, arg, as){
 	if(!tag){ return {to: onto} }
 	var u, tag = (this.tag || (this.tag = {}))[tag] ||
 	(this.tag[tag] = {tag: tag, to: onto._ = {
@@ -36,4 +35,3 @@ module.exports = function onto(tag, arg, as){
 	if((tag = tag.to) && u !== arg){ tag.next(arg) }
 	return tag;
 };
-	

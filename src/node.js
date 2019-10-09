@@ -1,7 +1,7 @@
+import Type from './type';
+import Val from './val';
 
-var Type = require('./type');
-var Val = require('./val');
-var Node = {_: '_'};
+const Node = {_: '_'};
 Node.soul = function(n, o){ return (n && n._ && n._[o || soul_]) } // convenience function to check to see if there is a soul on a node and return it.
 Node.soul.ify = function(n, o){ // put a soul on an object.
 	o = (typeof o === 'string')? {soul: o} : o || {};
@@ -50,9 +50,9 @@ Node.soul._ = Val.link._;
 		}
 	}
 }());
-var obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
-var text = Type.text, text_random = text.random;
-var soul_ = Node.soul._;
-var u;
-module.exports = Node;
-	
+const obj = Type.obj, obj_is = obj.is, obj_del = obj.del, obj_map = obj.map;
+const text = Type.text, text_random = text.random;
+const soul_ = Node.soul._;
+let u;
+
+export default Node;

@@ -1,6 +1,7 @@
+import Gun from './gun';
+import Mesh from './adapters/mesh';
 
-var Gun = require('../index');
-Gun.Mesh = require('./mesh');
+Gun.Mesh = Mesh;
 
 Gun.on('opt', function(root){
 	this.to.next(root);
@@ -19,7 +20,6 @@ Gun.on('opt', function(root){
 
 	var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
 
-	var wire = mesh.wire || opt.wire;
 	mesh.wire = opt.wire = open;
 	function open(peer){ try{
 		if(!peer || !peer.url){ return wire && wire(peer) }
@@ -53,5 +53,3 @@ Gun.on('opt', function(root){
 	}
 	var doc = 'undefined' !== typeof document && document;
 });
-var noop = function(){};
-	

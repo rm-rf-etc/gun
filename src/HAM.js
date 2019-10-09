@@ -1,4 +1,3 @@
-
 /* Based on the Hypothetical Amnesia Machine thought experiment */
 function HAM(machineState, incomingState, currentState, incomingValue, currentValue){
 	if(machineState < incomingState){
@@ -42,5 +41,5 @@ if(typeof JSON === 'undefined'){
 	);
 }
 var Lexical = JSON.stringify, undefined;
-module.exports = HAM;
-	
+
+export default HAM;

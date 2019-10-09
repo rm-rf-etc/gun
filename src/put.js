@@ -1,6 +1,5 @@
-
-var Gun = require('./root');
-Gun.chain.put = function(data, cb, as){
+import Gun from './gun';
+export default function(data, cb, as){
 	// #soul.has=value>state
 	// ~who#where.where=what>when@was
 	// TODO: BUG! Put probably cannot handle plural chains! `!as` is quickfix test.
@@ -229,4 +228,3 @@ function any(soul, as, msg, eve){
 var obj = Gun.obj, obj_is = obj.is, obj_put = obj.put, obj_map = obj.map;
 var u, empty = {}, noop = function(){}, iife = function(fn,as){fn.call(as||empty)};
 var node_ = Gun.node._;
-	

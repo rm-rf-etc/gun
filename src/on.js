@@ -1,6 +1,5 @@
-
-var Gun = require('./index');
-Gun.chain.on = function(tag, arg, eas, as){
+import Gun from './gun';
+export const on = function(tag, arg, eas, as){
 	var gun = this, at = gun._, tmp, act, off;
 	if(typeof tag === 'string'){
 		if(!arg){ return at.on(tag) }
@@ -20,7 +19,7 @@ Gun.chain.on = function(tag, arg, eas, as){
 }
 
 function ok(msg, ev){ var opt = this;
-	var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, cat = opt.at, tmp;
+	var gun = msg.$, at = (gun||{})._ || {}, data = at.put || msg.put, tmp;
 	if(u === data){
 		return;
 	}
@@ -47,11 +46,7 @@ function ok(msg, ev){ var opt = this;
 	}
 }
 
-Gun.chain.val = function(cb, opt){
-	Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
-	return this.once(cb, opt);
-}
-Gun.chain.once = function(cb, opt){
+export const once = function(cb, opt){
 	var gun = this, at = gun._, data = at.put;
 	if(0 < at.ack && u !== data){
 		(cb || noop).call(gun, data, at.get);
@@ -76,7 +71,7 @@ Gun.chain.once = function(cb, opt){
 
 function val(msg, eve, to){
 	if(!msg.$){ eve.off(); return }
-	var opt = this.as, cat = opt.at, gun = msg.$, at = gun._, data = at.put || msg.put, link, tmp;
+	var opt = this.as, gun = msg.$, at = gun._, data = at.put || msg.put, link, tmp;
 	if(tmp = msg.$$){
 		link = tmp = (msg.$$._);
 		if(u !== link.put){
@@ -98,7 +93,7 @@ function val(msg, eve, to){
 	opt.ok.call(gun || opt.$, data, msg.get);
 }
 
-Gun.chain.off = function(){
+export const off = function(){
 	// make off more aggressive. Warning, it might backfire!
 	var gun = this, at = gun._, tmp;
 	var cat = at.back;
@@ -138,4 +133,3 @@ Gun.chain.off = function(){
 var obj = Gun.obj, obj_map = obj.map, obj_has = obj.has, obj_del = obj.del, obj_to = obj.to;
 var rel = Gun.val.link;
 var empty = {}, noop = function(){}, u;
-	

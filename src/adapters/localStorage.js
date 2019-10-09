@@ -1,7 +1,6 @@
-
 if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
-var root, noop = function(){}, store, u;
+var noop = function(){}, store, u;
 try{store = (Gun.window||noop).localStorage}catch(e){}
 if(!store){
 	console.log("Warning: No localStorage exists to persist data to!");
@@ -143,4 +142,3 @@ Gun.on('create', function(root){
 		});
 	}
 });
-	

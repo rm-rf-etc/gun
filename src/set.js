@@ -1,6 +1,5 @@
-
-var Gun = require('./index');
-Gun.chain.set = function(item, cb, opt){
+import Gun from './gun';
+export default function(item, cb, opt){
 	var gun = this, soul;
 	cb = cb || function(){};
 	opt = opt || {}; opt.item = opt.item || item;
@@ -17,4 +16,3 @@ Gun.chain.set = function(item, cb, opt){
 	},true);
 	return item;
 }
-	

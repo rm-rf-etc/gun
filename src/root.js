@@ -1,28 +1,29 @@
+import Gun from './gun';
+import chain from './chain';
+import back from './back';
+import get from './get';
+import put from './put';
+import { on, once, off } from './on';
+import map from './map';
+import set from './set';
+import state from './state';
+import graph from './graph';
+import onto from './onto';
+import ask from './ask';
+import dup from './dup';
 
+Object.assign(Gun, { on: onto, state, graph, ask, dup });
+Object.assign(Gun.prototype, { chain, back, get, put, on, once, off, map, set });
 
-function Gun(o){
-	if(o instanceof Gun){ return (this._ = {gun: this, $: this}).$ }
-	if(!(this instanceof Gun)){ return new Gun(o) }
-	return Gun.create(this._ = {gun: this, $: this, opt: o});
-}
-
-Gun.is = function($){ return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
-
-Gun.version = 0.9;
-
-Gun.chain = Gun.prototype;
 Gun.chain.toJSON = function(){};
+Gun.is = function ($) { return ($ instanceof Gun) || ($ && $._ && ($ === $._.$)) || false }
 
-var Type = require('./type');
-Type.obj.to(Type, Gun);
-Gun.HAM = require('./HAM');
-Gun.val = require('./val');
-Gun.node = require('./node');
-Gun.state = require('./state');
-Gun.graph = require('./graph');
-Gun.on = require('./onto');
-Gun.ask = require('./ask');
-Gun.dup = require('./dup');
+export default Gun;
+
+Gun.chain.val = function(cb, opt){
+	Gun.log.once("onceval", "Future Breaking API Change: .val -> .once, apologies unexpected.");
+	return Gun.once(cb, opt);
+}
 
 ;(function(){
 	Gun.create = function(at){
@@ -220,7 +221,7 @@ Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, feel f
 
 if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window }
 try{ if(typeof common !== "undefined"){ common.exports = Gun } }catch(e){}
-module.exports = Gun;
+
 
 /*Gun.on('opt', function(ctx){ // FOR TESTING PURPOSES
 	this.to.next(ctx);
@@ -233,4 +234,3 @@ module.exports = Gun;
 		},1);
 	});
 });*/
-	
