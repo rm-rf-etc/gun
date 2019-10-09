@@ -387,8 +387,9 @@
 	// ---
 
 	USE('./state', function(module){
-		var Type = USE('./type');
-		var Node = USE('./node');
+		const Type = USE('./type');
+		const Node = USE('./node');
+
 		function State(){
 			var t;
 			/*if(perf){
