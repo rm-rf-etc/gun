@@ -661,7 +661,7 @@
 	// ---
 
 	USE('./dup', function(module){
-		var Type = USE('./type');
+		const Type = USE('./type');
 		function Dup(opt){
 			var dup = {s:{}};
 			opt = opt || {max: 1000, age: 1000 * 9};//1000 * 60 * 2};
@@ -969,7 +969,8 @@
 
 	USE('./back', function(module){
 		// var Gun = USE('./root');
-		module.exports = function(n, opt){ var tmp;
+		module.exports = function(n, opt){
+			var tmp;
 			n = n || 1;
 			if(-1 === n || Infinity === n){
 				return this._.root.$;
@@ -1687,9 +1688,10 @@
 
 	// ---
 
-	USE('./on', function(module){
+	// USE('./on', function(module){
+	USE('./on', function (_, exports) {
 		var Gun = USE('./gun');
-		module.exports.on = function(tag, arg, eas, as){
+		exports.on = function(tag, arg, eas, as){
 			var gun = this, at = gun._, tmp, act, off;
 			if(typeof tag === 'string'){
 				if(!arg){ return at.on(tag) }
@@ -1736,7 +1738,7 @@
 			}
 		}
 
-		module.exports.once = function(cb, opt){
+		exports.once = function(cb, opt){
 			var gun = this, at = gun._, data = at.put;
 			if(0 < at.ack && u !== data){
 				(cb || noop).call(gun, data, at.get);
@@ -1783,7 +1785,7 @@
 			opt.ok.call(gun || opt.$, data, msg.get);
 		}
 
-		module.exports.off = function(){
+		exports.off = function(){
 			// make off more aggressive. Warning, it might backfire!
 			var gun = this, at = gun._, tmp;
 			var cat = at.back;
