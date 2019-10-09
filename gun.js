@@ -1889,7 +1889,7 @@
 
 	// ---
 
-	USE('./adapters/localStorage', function(module){
+	USE('./adapters/localStorage', function(){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
 		var noop = function(){}, store, u;
@@ -2294,9 +2294,11 @@
 
 	// ---
 
-	USE('./adapters/websocket', function(module){
+	USE('./adapters/websocket', function(){
 		var Gun = USE('./gun');
-		Gun.Mesh = USE('./adapters/mesh');
+		var Mesh = USE('./adapters/mesh');
+
+		Gun.Mesh = Mesh;
 
 		Gun.on('opt', function(root){
 			this.to.next(root);
@@ -2315,7 +2317,6 @@
 
 			var mesh = opt.mesh = opt.mesh || Gun.Mesh(root);
 
-			var wire = mesh.wire || opt.wire;
 			mesh.wire = opt.wire = open;
 			function open(peer){ try{
 				if(!peer || !peer.url){ return wire && wire(peer) }
