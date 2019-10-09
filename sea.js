@@ -103,7 +103,6 @@
 	}).END();
 
 	USE('./buffer', function(module){
-		USE('./base64');
 		// This is Buffer implementation used in SEA. Functionality is mostly
 		// compatible with NodeJS 'safe-buffer' and is used for encoding conversions
 		// between binary and 'hex' | 'utf8' | 'base64'
@@ -221,7 +220,6 @@
 
 	USE('./settings', function(module){
 		var SEA = USE('./root');
-		// var Buffer = USE('./buffer');
 		var s = {};
 		s.pbkdf2 = {hash: 'SHA-256', iter: 100000, ks: 64};
 		s.ecdsa = {
