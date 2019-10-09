@@ -729,8 +729,6 @@
 
 	USE('./user', function(module){
 		var { Gun } = USE('./sea');
-		// var Gun = SEA.Gun;
-		var then = USE('./then');
 
 		function User(root){
 			this._ = {$: this};
