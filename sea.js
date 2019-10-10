@@ -11,7 +11,7 @@
 	var modules = {};
 	var exported = {};
 	function USE(name, fn) {
-		if (name === './gun') {
+		if (name === '../src') {
 			exported[name] = require(name);
 			return;
 		}
@@ -664,7 +664,8 @@
 		var verify = USE('./verify');
 		var encrypt = USE('./encrypt');
 		var decrypt = USE('./decrypt');
-		var Gun = USE('./gun');
+		var Gun = USE('../src');
+		var Buffer = USE('./buffer');
 
 		SEA.work = work;
 		SEA.sign = sign;
@@ -676,7 +677,7 @@
 
 		// This is Buffer used in SEA and usable from Gun/SEA application also.
 		// For documentation see https://nodejs.org/api/buffer.html
-		SEA.Buffer = SEA.Buffer || USE('./buffer');
+		SEA.Buffer = SEA.Buffer || Buffer;
 
 		// These SEA functions support now ony Promises or
 		// async/await (compatible) code, use those like Promises.
@@ -712,7 +713,7 @@
 		// But all other behavior needs to be equally easy, like opinionated ways of
 		// Adding friends (trusted public keys), sending private messages, etc.
 		// Cheers! Tell me what you think.
-		// var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'./gun', 1);
+		// var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'../src', 1);
 		Gun.SEA = SEA;
 		SEA.GUN = SEA.Gun = Gun;
 

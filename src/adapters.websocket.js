@@ -1,5 +1,5 @@
 import Gun from './gun';
-import Mesh from './adapters/mesh';
+import Mesh from './adapters.mesh';
 
 Gun.Mesh = Mesh;
 

@@ -8,7 +8,6 @@ function Gun(o){
 	if(!(this instanceof Gun)){ return new Gun(o) }
 	return Gun.create(this._ = {gun: this, $: this, opt: o});
 };
-export default Gun;
 
 Gun.version = 0.9;
 Gun.chain = Gun.prototype;

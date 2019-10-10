@@ -707,7 +707,6 @@
 			if(!(this instanceof Gun)){ return new Gun(o) }
 			return Gun.create(this._ = {gun: this, $: this, opt: o});
 		};
-		module.exports = Gun;
 
 		Gun.version = 0.9;
 		Gun.chain = Gun.prototype;
@@ -1889,7 +1888,7 @@
 
 	// ---
 
-	USE('./adapters/localStorage', function(){
+	USE('./adapters.localStorage', function(){
 		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
 
 		var noop = function(){}, store, u;
@@ -2038,7 +2037,7 @@
 
 	// ---
 
-	USE('./adapters/mesh', function(module){
+	USE('./adapters.mesh', function(module){
 		var Type = USE('./type');
 
 		function Mesh(root){
@@ -2296,9 +2295,9 @@
 
 	// ---
 
-	USE('./adapters/websocket', function(){
+	USE('./adapters.websocket', function(){
 		var Gun = USE('./gun');
-		var Mesh = USE('./adapters/mesh');
+		var Mesh = USE('./adapters.mesh');
 
 		Gun.Mesh = Mesh;
 
@@ -2358,9 +2357,9 @@
 
 	USE('./index', function(){
 		USE('./root');
-		USE('./adapters/localStorage');
-		USE('./adapters/mesh');
-		USE('./adapters/websocket');
+		USE('./adapters.localStorage');
+		USE('./adapters.mesh');
+		USE('./adapters.websocket');
 	}).END();
 
 	USE('./index');

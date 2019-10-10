@@ -6,7 +6,8 @@ import sign from './sign';
 import verify from './verify';
 import encrypt from './encrypt';
 import decrypt from './decrypt';
-import Gun from './gun';
+import Gun from '../src';
+import Buffer from './buffer';
 
 SEA.work = work;
 SEA.sign = sign;
@@ -18,7 +19,7 @@ SEA.random = SEA.random || shim.random;
 
 // This is Buffer used in SEA and usable from Gun/SEA application also.
 // For documentation see https://nodejs.org/api/buffer.html
-SEA.Buffer = SEA.Buffer || import './buffer';
+SEA.Buffer = SEA.Buffer || Buffer;
 
 // These SEA functions support now ony Promises or
 // async/await (compatible) code, use those like Promises.
@@ -54,7 +55,7 @@ SEA.keyid = SEA.keyid || (async (pub) => {
 // But all other behavior needs to be equally easy, like opinionated ways of
 // Adding friends (trusted public keys), sending private messages, etc.
 // Cheers! Tell me what you think.
-// var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'./gun', 1);
+// var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'../src', 1);
 Gun.SEA = SEA;
 SEA.GUN = SEA.Gun = Gun;
 

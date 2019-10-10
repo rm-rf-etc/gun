@@ -49,9 +49,9 @@
 		module.exports = AXE;
 	}).END();
 
-	USE('./axe', function (module) {
+	USE('./index', function (module) {
 		const AXE = USE('./root');
-		const GunImport = USE('./gun');
+		const GunImport = USE('../src');
 
 		var Gun = (AXE.window || {}).Gun || GunImport;
 		(Gun.AXE = AXE).GUN = AXE.Gun = Gun;
