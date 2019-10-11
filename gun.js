@@ -943,12 +943,12 @@
 		Gun.log = function(){ return (!Gun.log.off && console.log.apply(console, arguments)), [].slice.call(arguments).join(' ') }
 		Gun.log.once = function(w,s,o){ return (o = Gun.log.once)[w] = o[w] || 0, o[w]++ || Gun.log(s) }
 
-		;"Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!";
+		// Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!
 		Gun.log.once("welcome", "Hello wonderful person! :) Thanks for using GUN, feel free to ask for help on https://gitter.im/amark/gun and ask StackOverflow questions tagged with 'gun'!");
-		;"Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!";
+		// Please do not remove these messages unless you are paying for a monthly sponsorship, thanks!
 
-		if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window }
-		try{ if(typeof common !== "undefined"){ common.exports = Gun } }catch(e){}
+		// if(typeof window !== "undefined"){ (window.GUN = window.Gun = Gun).window = window }
+		// try{ if(typeof common !== "undefined"){ common.exports = Gun } }catch(e){}
 
 
 		/*Gun.on('opt', function(ctx){ // FOR TESTING PURPOSES
@@ -1889,7 +1889,7 @@
 	// ---
 
 	USE('./adapters.localStorage', function(){
-		if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
+		const Gun = USE('./gun');
 
 		var noop = function(){}, store, u;
 		try{store = (Gun.window||noop).localStorage}catch(e){}
@@ -1910,7 +1910,7 @@
 			if(false === opt.localStorage){ return ev.next(root) } // we want offline resynce queue regardless! // actually, this doesn't help, per @go1dfish 's observation. Disabling for now, will need better solution later.
 			opt.prefix = opt.file || 'gun/';
 			var gap = Gun.obj.ify(store.getItem('gap/'+opt.prefix)) || {};
-			var empty = Gun.obj.empty, id, to, go;
+			var empty = Gun.obj.empty, id, to;
 			// add re-sync command.
 			if(!empty(gap)){
 				var disk = Gun.obj.ify(store.getItem(opt.prefix)) || {}, send = {};
@@ -2355,12 +2355,15 @@
 
 	// ---
 
-	USE('./index', function(){
-		USE('./root');
+	USE('./index', function(module){
+		const Gun = USE('./root');
 		USE('./adapters.localStorage');
 		USE('./adapters.mesh');
 		USE('./adapters.websocket');
+		module.exports = Gun;
 	}).END();
 
-	USE('./index');
+	const Gun = USE('./index');
+	if (typeof window !== "undefined") { (window.GUN = window.Gun = Gun).window = window }
+	try { if (typeof common !== "undefined") { common.exports = Gun } } catch (e) { }
 }());

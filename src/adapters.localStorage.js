@@ -1,4 +1,4 @@
-if(typeof Gun === 'undefined'){ return } // TODO: localStorage is Browser only. But it would be nice if it could somehow plugin into NodeJS compatible localStorage APIs?
+import Gun from './gun';
 
 var noop = function(){}, store, u;
 try{store = (Gun.window||noop).localStorage}catch(e){}
@@ -19,7 +19,7 @@ Gun.on('create', function(root){
 	if(false === opt.localStorage){ return ev.next(root) } // we want offline resynce queue regardless! // actually, this doesn't help, per @go1dfish 's observation. Disabling for now, will need better solution later.
 	opt.prefix = opt.file || 'gun/';
 	var gap = Gun.obj.ify(store.getItem('gap/'+opt.prefix)) || {};
-	var empty = Gun.obj.empty, id, to, go;
+	var empty = Gun.obj.empty, id, to;
 	// add re-sync command.
 	if(!empty(gap)){
 		var disk = Gun.obj.ify(store.getItem(opt.prefix)) || {}, send = {};
