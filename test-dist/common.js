@@ -26,7 +26,7 @@ describe('Gun', function(){
 			require('./rad/rad.js');
 			require('./sea/sea.js');
 		}
-	}(this));
+	}());
 	//Gun.log.squelch = true;
 	var gleak = {globals: {}, check: function(){ // via tobyho
 	  var leaked = []
