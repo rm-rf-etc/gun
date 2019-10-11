@@ -15,9 +15,7 @@
     "e2e": "mocha e2e/distributed.js",
     "docker": "hooks/build",
     "build": "node lib/unbuild.js",
-    "webpack:gun": "webpack src/index.js -o dist/gun.js",
-    "webpack:sea": "webpack sea/index.js -o dist/sea.js",
-    "webpack:axe": "webpack axe/index.js -o dist/axe.js"
+    "webpack": "webpack"
   },
   "repository": {
     "type": "git",

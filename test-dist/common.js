@@ -17,7 +17,7 @@ describe('Gun', function(){
 			root.Gun = root.Gun;
 			root.Gun.TESTING = true;
 		} else {
-			root.Gun = require('../gun');
+			root.Gun = require('../dist/gun').default;
 			root.Gun.TESTING = true;
 			Gun.serve = require('../lib/serve');
 			//require('../lib/file');
