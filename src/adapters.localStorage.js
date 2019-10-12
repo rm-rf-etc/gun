@@ -1,11 +1,14 @@
 import Gun from './gun';
+const globalThis = Function('return this')();
 
-var noop = function(){}, store, u;
-try{store = (Gun.window||noop).localStorage}catch(e){}
-if(!store){
+if (!globalThis.localStorage) {
 	console.log("Warning: No localStorage exists to persist data to!");
-	store = {setItem: function(k,v){this[k]=v}, removeItem: function(k){delete this[k]}, getItem: function(k){return this[k]}};
 }
+const store = globalThis.localStorage ? globalThis.localStorage : {
+	setItem: (k, v) => { store[k] = v },
+	removeItem: (k) => { delete store[k] },
+	getItem: (k) => { return store[k] },
+};
 /*
 	NOTE: Both `lib/file.js` and `lib/memdisk.js` are based on this design!
 	If you update anything here, consider updating the other adapters as well.
@@ -80,9 +83,8 @@ Gun.on('create', function(root){
 	if(root.once){ return }
 	if(false === opt.localStorage){ return }
 	opt.prefix = opt.file || 'gun/';
-	var graph = root.graph, acks = {}, count = 0, to;
+	var acks = {}, count = 0, to;
 	var disk = Gun.obj.ify(store.getItem(opt.prefix)) || {};
-	var lS = function(){}, u;
 	root.on('localStorage', disk); // NON-STANDARD EVENT!
 
 	root.on('put', function(at){
@@ -115,11 +117,11 @@ Gun.on('create', function(root){
 		Gun.debug? setTimeout(to,1) : to();
 	});
 
-	var map = function(val, key, node, soul){
+	const map = function(val, key, node, soul){
 		disk[soul] = Gun.state.to(node, key, disk[soul]);
 	}
 
-	var flush = function(data){
+	const flush = function(data){
 		var err;
 		count = 0;
 		clearTimeout(to);
@@ -140,5 +142,5 @@ Gun.on('create', function(root){
 				ok: 0 // localStorage isn't reliable, so make its `ok` code be a low number.
 			});
 		});
-	}
+	};
 });
