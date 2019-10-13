@@ -1,12 +1,11 @@
+var SEA = {};
 import shim from './shim';
 // Practical examples about usage found from ./test/common.js
-import SEA from './root';
 import work from './work';
 import sign from './sign';
 import verify from './verify';
 import encrypt from './encrypt';
 import decrypt from './decrypt';
-import Gun from '../src';
 import Buffer from './buffer';
 
 SEA.work = work;
@@ -56,7 +55,13 @@ SEA.keyid = SEA.keyid || (async (pub) => {
 // Adding friends (trusted public keys), sending private messages, etc.
 // Cheers! Tell me what you think.
 // var Gun = (SEA.window||{}).Gun || USE((typeof common == "undefined"?'.':'')+'../src', 1);
-Gun.SEA = SEA;
-SEA.GUN = SEA.Gun = Gun;
 
+// export default (Gun) => {
+// 	if (Gun.SEA) return Gun.SEA;
+
+// 	Gun.SEA = SEA;
+// 	SEA.GUN = SEA.Gun = Gun;
+
+// 	return Gun.SEA;
+// };
 export default SEA;

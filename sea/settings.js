@@ -1,4 +1,4 @@
-import SEA from './root';
+import SEA from './sea';
 var s = {};
 s.pbkdf2 = {hash: 'SHA-256', iter: 100000, ks: 64};
 s.ecdsa = {

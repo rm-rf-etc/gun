@@ -1,4 +1,4 @@
-import SEA from './root';
+import SEA from './sea';
 try{ if(SEA.window){
 	if(location.protocol.indexOf('s') < 0
 	&& location.host.indexOf('localhost') < 0

@@ -1,4 +1,4 @@
-import SEA from './root';
+import SEA from './sea';
 import shim from './shim';
 import S from './settings';
 // Derive shared secret from other's pub and my epub/epriv

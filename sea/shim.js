@@ -1,15 +1,16 @@
-import SEA from './root';
 import Buffer from './buffer';
-const api = {Buffer: Buffer}
-var o = {};
 
-if(SEA.window){
-	api.crypto = window.crypto || window.msCrypto;
-	api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
-	api.TextEncoder = window.TextEncoder;
-	api.TextDecoder = window.TextDecoder;
-	api.random = (len) => Buffer.from(api.crypto.getRandomValues(new Uint8Array(Buffer.alloc(len))))
-}
+const api = {Buffer: Buffer}
+const globalThis = Function('return this')();
+
+let o = {};
+
+api.crypto = globalThis.crypto || globalThis.msCrypto;
+api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
+api.TextEncoder = globalThis.TextEncoder;
+api.TextDecoder = globalThis.TextDecoder;
+api.random = (len) => Buffer.from(api.crypto.getRandomValues(new Uint8Array(Buffer.alloc(len))))
+
 if(!api.crypto){try{
 	var crypto = USE('crypto', 1);
 	const { TextEncoder, TextDecoder } = USE('text-encoding', 1);
@@ -31,4 +32,4 @@ if(!api.crypto){try{
 	OSSL_WEBCRYPTO_OR_TEXT_ENCODING_NOT_INSTALLED;
 }}
 
-export default api
+export default api;

@@ -1,4 +1,4 @@
-import SEA from './root';
+import SEA from './sea';
 import shim from './shim';
 import S from './settings';
 import sha from './sha256';

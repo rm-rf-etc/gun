@@ -1,4 +1,4 @@
-import SEA from './root';
+import SEA from './sea';
 import shim from './shim';
 import aeskey from './aeskey';
 var u;

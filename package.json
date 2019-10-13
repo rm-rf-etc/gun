@@ -5,16 +5,16 @@
   "main": "index.js",
   "browser": "gun.js",
   "scripts": {
-    "start": "node examples/http.js",
+    "start": "node -r esm examples/http.js",
     "https": "HTTPS_KEY=test/https/server.key HTTPS_CERT=test/https/server.crt npm start",
     "prepublishOnly": "npm run unbuild",
     "test": "mocha",
-    "test:dist": "TEST_TARGET=DIST mocha './test-dist/*.js'",
+    "test:dist": "TEST_TARGET=DIST mocha -r esm './test-dist/*.js'",
     "testsea": "mocha test/sea.js",
     "testaxe": "mocha test/axe/holy-grail.js",
     "e2e": "mocha e2e/distributed.js",
     "docker": "hooks/build",
-    "build": "node lib/unbuild.js",
+    "build": "node -r esm lib/unbuild.js",
     "webpack": "webpack"
   },
   "repository": {
@@ -61,6 +61,8 @@
   },
   "devDependencies": {
     "aws-sdk": ">=2.153.0",
+    "esm": "^3.2.25",
+    "expect": "^24.9.0",
     "ip": "^1.1.5",
     "mocha": "^6.2.0",
     "mock-local-storage": "^1.1.8",
