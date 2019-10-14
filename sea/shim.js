@@ -1,35 +1,32 @@
+import { Crypto } from '@peculiar/webcrypto';
+import textEncoding from 'text-encoding';
+import cryptoLib from 'crypto';
 import Buffer from './buffer';
 
-const api = {Buffer: Buffer}
-const globalThis = Function('return this')();
-
-let o = {};
-
-api.crypto = globalThis.crypto || globalThis.msCrypto;
-api.subtle = (api.crypto||o).subtle || (api.crypto||o).webkitSubtle;
-api.TextEncoder = globalThis.TextEncoder;
-api.TextDecoder = globalThis.TextDecoder;
-api.random = (len) => Buffer.from(api.crypto.getRandomValues(new Uint8Array(Buffer.alloc(len))))
-
-if(!api.crypto){try{
-	var crypto = USE('crypto', 1);
-	const { TextEncoder, TextDecoder } = USE('text-encoding', 1);
-	Object.assign(api, {
-		crypto,
-		//subtle,
-		TextEncoder,
-		TextDecoder,
-		random: (len) => Buffer.from(crypto.randomBytes(len))
-	});
-	//try{
-		const { Crypto: WebCrypto } = USE('@peculiar/webcrypto', 1);
-		api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle // ECDH
-	//}catch(e){
-		//console.log("node-webcrypto-ossl is optionally needed for ECDH, please install if needed.");
-	//}
-}catch(e){
-	console.log("node-webcrypto-ossl and text-encoding may not be included by default, please add it to your package.json!");
-	OSSL_WEBCRYPTO_OR_TEXT_ENCODING_NOT_INSTALLED;
-}}
+const gThis = Function('return this')();
+const crypto = gThis.crypto || gThis.msCrypto || cryptoLib;
+const { TextEncoder, TextDecoder } = textEncoding;
+const api = {
+	Buffer,
+	crypto,
+	TextEncoder,
+	TextDecoder,
+	// subtle: crypto.subtle || crypto.webkitSubtle || null,
+	// ossl: new WebCrypto({directory: 'ossl'}).subtle, // ECDH
+	// subtle: new WebCrypto({directory: 'ossl'}).subtle, // ECDH
+	random: (len) => (
+		Buffer.from(crypto.getRandomValues(new Uint8Array(Buffer.alloc(len))))
+	),
+};
+api.ossl = api.subtle = new Crypto({directory: 'ossl'}).subtle // ECDH
 
 export default api;
+// ?????
+// Object.assign(api, {
+// 	random: (len) => Buffer.from(crypto.randomBytes(len))
+// });
+
+// const globalThis = Function('return this')();
+// api.crypto = globalThis.crypto || globalThis.msCrypto;
+// api.TextEncoder = globalThis.TextEncoder;
+// api.TextDecoder = globalThis.TextDecoder;

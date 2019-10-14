@@ -31,7 +31,7 @@
 		}
 		if (!exported[name]) {
 			// console.log('USE MODULE:', name);
-			modules[name]();
+			if (modules[name]) modules[name]();
 		}
 		return exported[name];
 	};
@@ -72,15 +72,20 @@
 		} }catch(e){}
 	}).END();
 
-	USE('./base64', function(module){
-		if(typeof global !== "undefined"){
-			var g = global;
-			g.btoa = function (data) { return Buffer.from(data, "binary").toString("base64"); };
-			g.atob = function (data) { return Buffer.from(data, "base64").toString("binary"); };
-		}
+	USE('./base64', function(_, exports){
+		const _btoa = data => Buffer.from(data, "binary").toString("base64");
+		const _atob = data => Buffer.from(data, "base64").toString("binary");
+
+		const gThis = Function('return this')();
+		gThis.btoa = gThis.btoa || _btoa;
+		gThis.atob = gThis.atob || _atob;
+
+		exports.btoa = _btoa;
+		exports.atob = _atob;
 	}).END();
 
 	USE('./array', function(module){
+		const { btoa } = USE('./base64');
 		// This is Array extended to have .toString(['utf8'|'hex'|'base64'])
 		function SeaArray() {}
 		Object.assign(SeaArray, { from: Array.from })
@@ -106,6 +111,7 @@
 	}).END();
 
 	USE('./buffer', function(module){
+		const { atob } = USE('./base64');
 		// This is Buffer implementation used in SEA. Functionality is mostly
 		// compatible with NodeJS 'safe-buffer' and is used for encoding conversions
 		// between binary and 'hex' | 'utf8' | 'base64'
@@ -184,25 +190,29 @@
 	}).END();
 
 	USE('./shim', function(module){
-		const { Crypto: WebCrypto } = USE('@peculiar/webcrypto');
+		const { Crypto } = USE('@peculiar/webcrypto');
 		const textEncoding = USE('text-encoding');
-		const crypto = USE('crypto');
+		const cryptoLib = USE('crypto');
 		const Buffer = USE('./buffer');
 
+		const gThis = Function('return this')();
+		const crypto = gThis.crypto || gThis.msCrypto || cryptoLib;
 		const { TextEncoder, TextDecoder } = textEncoding;
-		module.exports = {
+		const api = {
 			Buffer,
 			crypto,
 			TextEncoder,
 			TextDecoder,
-			subtle: crypto.subtle || (api.crypto || {}).webkitSubtle,
+			// subtle: crypto.subtle || crypto.webkitSubtle || null,
 			// ossl: new WebCrypto({directory: 'ossl'}).subtle, // ECDH
 			// subtle: new WebCrypto({directory: 'ossl'}).subtle, // ECDH
 			random: (len) => (
 				Buffer.from(crypto.getRandomValues(new Uint8Array(Buffer.alloc(len))))
 			),
 		};
+		api.ossl = api.subtle = new Crypto({directory: 'ossl'}).subtle // ECDH
 
+		module.exports = api;
 		// ?????
 		// Object.assign(api, {
 		// 	random: (len) => Buffer.from(crypto.randomBytes(len))
@@ -212,45 +222,46 @@
 		// api.crypto = globalThis.crypto || globalThis.msCrypto;
 		// api.TextEncoder = globalThis.TextEncoder;
 		// api.TextDecoder = globalThis.TextDecoder;
-
-		// api.ossl = api.subtle = new WebCrypto({directory: 'ossl'}).subtle // ECDH
 	}).END();
 
 	USE('./settings', function(module){
-		var SEA = USE('./sea');
-		var s = {};
-		s.pbkdf2 = {hash: 'SHA-256', iter: 100000, ks: 64};
-		s.ecdsa = {
-			pair: {name: 'ECDSA', namedCurve: 'P-256'},
-			sign: {name: 'ECDSA', hash: {name: 'SHA-256'}}
-		};
-		s.ecdh = {name: 'ECDH', namedCurve: 'P-256'};
+		let s;
+		module.exports = (SEA) => {
+			if (s) return s;
+			s = {};
+			s.pbkdf2 = {hash: 'SHA-256', iter: 100000, ks: 64};
+			s.ecdsa = {
+				pair: {name: 'ECDSA', namedCurve: 'P-256'},
+				sign: {name: 'ECDSA', hash: {name: 'SHA-256'}}
+			};
+			s.ecdh = {name: 'ECDH', namedCurve: 'P-256'};
 
-		// This creates Web Cryptography API compliant JWK for sign/verify purposes
-		s.jwk = function(pub, d){  // d === priv
-			pub = pub.split('.');
-			var x = pub[0], y = pub[1];
-			var jwk = {kty: "EC", crv: "P-256", x: x, y: y, ext: true};
-			jwk.key_ops = d ? ['sign'] : ['verify'];
-			if(d){ jwk.d = d }
-			return jwk;
-		};
-		s.recall = {
-			validity: 12 * 60 * 60, // internally in seconds : 12 hours
-			hook: function(props){ return props } // { iat, exp, alias, remember } // or return new Promise((resolve, reject) => resolve(props)
-		};
+			// This creates Web Cryptography API compliant JWK for sign/verify purposes
+			s.jwk = function(pub, d){  // d === priv
+				pub = pub.split('.');
+				var x = pub[0], y = pub[1];
+				var jwk = {kty: "EC", crv: "P-256", x: x, y: y, ext: true};
+				jwk.key_ops = d ? ['sign'] : ['verify'];
+				if(d){ jwk.d = d }
+				return jwk;
+			};
+			s.recall = {
+				validity: 12 * 60 * 60, // internally in seconds : 12 hours
+				hook: function(props){ return props } // { iat, exp, alias, remember } // or return new Promise((resolve, reject) => resolve(props)
+			};
 
-		s.check = function(t){ return (typeof t == 'string') && ('SEA{' === t.slice(0,4)) }
-		s.parse = function p(t){ try {
-			var yes = (typeof t == 'string');
-			if(yes && 'SEA{' === t.slice(0,4)){ t = t.slice(3) }
-			return yes ? JSON.parse(t) : t;
-			} catch (e) {}
-			return t;
-		}
+			s.check = function(t){ return (typeof t == 'string') && ('SEA{' === t.slice(0,4)) }
+			s.parse = function p(t){ try {
+				var yes = (typeof t == 'string');
+				if(yes && 'SEA{' === t.slice(0,4)){ t = t.slice(3) }
+				return yes ? JSON.parse(t) : t;
+				} catch (e) {}
+				return t;
+			}
 
-		SEA.opt = s;
-		module.exports = s;
+			SEA.opt = s;
+			return s;
+		};
 	}).END();
 
 	USE('./sha256', function(module){
@@ -272,52 +283,59 @@
 	}).END();
 
 	USE('./work', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
-		var sha = USE('./sha256');
-		var u;
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const sha = USE('./sha256');
 
-		SEA.work = SEA.work || (async (data, pair, cb, opt) => { try { // used to be named `proof`
-			var salt = (pair||{}).epub || pair; // epub not recommended, salt should be random!
-			var opt = opt || {};
-			if(salt instanceof Function){
-				cb = salt;
-				salt = u;
-			}
-			salt = salt || shim.random(9);
-			data = (typeof data == 'string')? data : JSON.stringify(data);
-			if('sha' === (opt.name||'').toLowerCase().slice(0,3)){
-				var rsha = shim.Buffer.from(await sha(data, opt.name), 'binary').toString(opt.encode || 'base64')
-				if(cb){ try{ cb(rsha) }catch(e){console.log(e)} }
-				return rsha;
-			}
-			var key = await (shim.ossl || shim.subtle).importKey('raw', new shim.TextEncoder().encode(data), {name: opt.name || 'PBKDF2'}, false, ['deriveBits']);
-			var work = await (shim.ossl || shim.subtle).deriveBits({
-				name: opt.name || 'PBKDF2',
-				iterations: opt.iterations || S.pbkdf2.iter,
-				salt: new shim.TextEncoder().encode(opt.salt || salt),
-				hash: opt.hash || S.pbkdf2.hash,
-			}, key, opt.length || (S.pbkdf2.ks * 8))
-			data = shim.random(data.length)  // Erase data in case of passphrase
-			var r = shim.Buffer.from(work, 'binary').toString(opt.encode || 'base64')
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		} catch(e) {
-			console.log(e);
-			SEA.err = e;
-			if(SEA.throw){ throw e }
-			if(cb){ cb() }
-			return;
-		}});
+		let result;
+		module.exports = (SEA) => {
+			if (result) return result;
+			const S = settings(SEA);
+			let u;
 
-		module.exports = SEA.work;
+			SEA.work = SEA.work || (async (data, pair, cb, opt) => { try { // used to be named `proof`
+				var salt = (pair||{}).epub || pair; // epub not recommended, salt should be random!
+				var opt = opt || {};
+				if(salt instanceof Function){
+					cb = salt;
+					salt = u;
+				}
+				salt = salt || shim.random(9);
+				data = (typeof data == 'string')? data : JSON.stringify(data);
+				if('sha' === (opt.name||'').toLowerCase().slice(0,3)){
+					var rsha = shim.Buffer.from(await sha(data, opt.name), 'binary').toString(opt.encode || 'base64')
+					if(cb){ try{ cb(rsha) }catch(e){console.log(e)} }
+					return rsha;
+				}
+				var key = await (shim.ossl || shim.subtle).importKey('raw', new shim.TextEncoder().encode(data), {name: opt.name || 'PBKDF2'}, false, ['deriveBits']);
+				var work = await (shim.ossl || shim.subtle).deriveBits({
+					name: opt.name || 'PBKDF2',
+					iterations: opt.iterations || S.pbkdf2.iter,
+					salt: new shim.TextEncoder().encode(opt.salt || salt),
+					hash: opt.hash || S.pbkdf2.hash,
+				}, key, opt.length || (S.pbkdf2.ks * 8))
+				data = shim.random(data.length)  // Erase data in case of passphrase
+				var r = shim.Buffer.from(work, 'binary').toString(opt.encode || 'base64')
+				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+				return r;
+			} catch(e) {
+				console.log(e);
+				SEA.err = e;
+				if(SEA.throw){ throw e }
+				if(cb){ cb() }
+				return;
+			}});
+
+			result = SEA.work;
+			return SEA.work;
+		};
 	}).END();
 
 	USE('./pair', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
+		const SEA = USE('./sea');
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const S = settings(SEA);
 
 		SEA.name = SEA.name || (async (cb, opt) => { try {
 			if(cb){ try{ cb() }catch(e){console.log(e)} }
@@ -389,122 +407,135 @@
 	}).END();
 
 	USE('./sign', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
-		var sha = USE('./sha256');
-		var u;
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const sha = USE('./sha256');
 
-		SEA.sign = SEA.sign || (async (data, pair, cb, opt) => { try {
-			opt = opt || {};
-			if(!(pair||opt).priv){
-				pair = await SEA.I(null, {what: data, how: 'sign', why: opt.why});
-			}
-			if(u === data){ throw '`undefined` not allowed.' }
-			var json = S.parse(data);
-			var check = opt.check = opt.check || json;
-			if(SEA.verify && (SEA.opt.check(check) || (check && check.s && check.m))
-			&& u !== await SEA.verify(check, pair)){ // don't sign if we already signed it.
-				var r = S.parse(check);
+		let result;
+		module.exports = (SEA) => {
+			if (result) return result;
+			const S = settings(SEA);
+			let u;
+
+			SEA.sign = SEA.sign || (async (data, pair, cb, opt) => { try {
+				opt = opt || {};
+				if(!(pair||opt).priv){
+					pair = await SEA.I(null, {what: data, how: 'sign', why: opt.why});
+				}
+				if(u === data){ throw '`undefined` not allowed.' }
+				var json = S.parse(data);
+				var check = opt.check = opt.check || json;
+				if(SEA.verify && (SEA.opt.check(check) || (check && check.s && check.m))
+				&& u !== await SEA.verify(check, pair)){ // don't sign if we already signed it.
+					var r = S.parse(check);
+					if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+					if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+					return r;
+				}
+				var pub = pair.pub;
+				var priv = pair.priv;
+				var jwk = S.jwk(pub, priv);
+				var hash = await sha(json);
+				var sig = await (shim.ossl || shim.subtle).importKey('jwk', jwk, S.ecdsa.pair, false, ['sign'])
+				.then((key) => (shim.ossl || shim.subtle).sign(S.ecdsa.sign, key, new Uint8Array(hash))) // privateKey scope doesn't leak out from here!
+				var r = {m: json, s: shim.Buffer.from(sig, 'binary').toString(opt.encode || 'base64')}
 				if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+
 				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
 				return r;
-			}
-			var pub = pair.pub;
-			var priv = pair.priv;
-			var jwk = S.jwk(pub, priv);
-			var hash = await sha(json);
-			var sig = await (shim.ossl || shim.subtle).importKey('jwk', jwk, S.ecdsa.pair, false, ['sign'])
-			.then((key) => (shim.ossl || shim.subtle).sign(S.ecdsa.sign, key, new Uint8Array(hash))) // privateKey scope doesn't leak out from here!
-			var r = {m: json, s: shim.Buffer.from(sig, 'binary').toString(opt.encode || 'base64')}
-			if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+			} catch(e) {
+				console.log(e);
+				SEA.err = e;
+				if(SEA.throw){ throw e }
+				if(cb){ cb() }
+				return;
+			}});
 
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		} catch(e) {
-			console.log(e);
-			SEA.err = e;
-			if(SEA.throw){ throw e }
-			if(cb){ cb() }
-			return;
-		}});
-
-		module.exports = SEA.sign;
+			result = SEA.sign;
+			return SEA.sign;
+		};
 	}).END();
 
 	USE('./verify', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
-		var sha = USE('./sha256');
-		var u;
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const sha = USE('./sha256');
 
-		SEA.verify = SEA.verify || (async (data, pair, cb, opt) => { try {
-			var json = S.parse(data);
-			if(false === pair){ // don't verify!
-				var raw = S.parse(json.m);
-				if(cb){ try{ cb(raw) }catch(e){console.log(e)} }
-				return raw;
-			}
-			opt = opt || {};
-			// SEA.I // verify is free! Requires no user permission.
-			var pub = pair.pub || pair;
-			var key = SEA.opt.slow_leak? await SEA.opt.slow_leak(pub) : await (shim.ossl || shim.subtle).importKey('jwk', jwk, S.ecdsa.pair, false, ['verify']);
-			var hash = await sha(json.m);
-			var buf, sig, check, tmp; try{
-				buf = shim.Buffer.from(json.s, opt.encode || 'base64'); // NEW DEFAULT!
-				sig = new Uint8Array(buf);
-				check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash));
-				if(!check){ throw "Signature did not match." }
-			}catch(e){
-				if(SEA.opt.fallback){
-					return await SEA.opt.fall_verify(data, pair, cb, opt);
+		let result;
+		module.exports = (SEA) => {
+			if (result) return result;
+			const S = settings(SEA);
+			let u;
+
+			SEA.verify = SEA.verify || (async (data, pair, cb, opt) => { try {
+				var json = S.parse(data);
+				if(false === pair){ // don't verify!
+					var raw = S.parse(json.m);
+					if(cb){ try{ cb(raw) }catch(e){console.log(e)} }
+					return raw;
 				}
+				opt = opt || {};
+				// SEA.I // verify is free! Requires no user permission.
+				var pub = pair.pub || pair;
+				var key = SEA.opt.slow_leak? await SEA.opt.slow_leak(pub) : await (shim.ossl || shim.subtle).importKey('jwk', S.jwk, S.ecdsa.pair, false, ['verify']);
+				var hash = await sha(json.m);
+				var buf, sig, check, tmp; try{
+					buf = shim.Buffer.from(json.s, opt.encode || 'base64'); // NEW DEFAULT!
+					sig = new Uint8Array(buf);
+					check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash));
+					if(!check){ throw "Signature did not match." }
+				}catch(e){
+					if(SEA.opt.fallback){
+						return await SEA.opt.fall_verify(data, pair, cb, opt);
+					}
+				}
+				var r = check? S.parse(json.m) : u;
+
+				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+				return r;
+			} catch(e) {
+				console.log(e); // mismatched owner FOR MARTTI
+				SEA.err = e;
+				if(SEA.throw){ throw e }
+				if(cb){ cb() }
+				return;
+			}});
+
+			// legacy & ossl leak mitigation:
+
+			// var knownKeys = {};
+			// var keyForPair = SEA.opt.slow_leak = pair => {
+			// 	if (knownKeys[pair]) return knownKeys[pair];
+			// 	var jwk = S.jwk(pair);
+			// 	knownKeys[pair] = (shim.ossl || shim.subtle).importKey("jwk", jwk, S.ecdsa.pair, false, ["verify"]);
+			// 	return knownKeys[pair];
+			// };
+
+
+			SEA.opt.fall_verify = async function(data, pair, cb, opt, f){
+				if(f === SEA.opt.fallback){ throw "Signature did not match" } f = f || 1;
+				var json = S.parse(data), pub = pair.pub || pair, key = await SEA.opt.slow_leak(pub);
+				var hash = (f <= SEA.opt.fallback)? shim.Buffer.from(await shim.subtle.digest({name: 'SHA-256'}, new shim.TextEncoder().encode(S.parse(json.m)))) : await sha(json.m); // this line is old bad buggy code but necessary for old compatibility.
+				var buf; var sig; var check; try{
+					buf = shim.Buffer.from(json.s, opt.encode || 'base64') // NEW DEFAULT!
+					sig = new Uint8Array(buf)
+					check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash))
+					if(!check){ throw "Signature did not match." }
+				}catch(e){
+					buf = shim.Buffer.from(json.s, 'utf8') // AUTO BACKWARD OLD UTF8 DATA!
+					sig = new Uint8Array(buf)
+					check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash))
+					if(!check){ throw "Signature did not match." }
+				}
+				var r = check? S.parse(json.m) : u;
+				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+				return r;
 			}
-			var r = check? S.parse(json.m) : u;
+			SEA.opt.fallback = 2;
 
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		} catch(e) {
-			console.log(e); // mismatched owner FOR MARTTI
-			SEA.err = e;
-			if(SEA.throw){ throw e }
-			if(cb){ cb() }
-			return;
-		}});
-
-		module.exports = SEA.verify;
-		// legacy & ossl leak mitigation:
-
-		// var knownKeys = {};
-		// var keyForPair = SEA.opt.slow_leak = pair => {
-		// 	if (knownKeys[pair]) return knownKeys[pair];
-		// 	var jwk = S.jwk(pair);
-		// 	knownKeys[pair] = (shim.ossl || shim.subtle).importKey("jwk", jwk, S.ecdsa.pair, false, ["verify"]);
-		// 	return knownKeys[pair];
-		// };
-
-
-		SEA.opt.fall_verify = async function(data, pair, cb, opt, f){
-			if(f === SEA.opt.fallback){ throw "Signature did not match" } f = f || 1;
-			var json = S.parse(data), pub = pair.pub || pair, key = await SEA.opt.slow_leak(pub);
-			var hash = (f <= SEA.opt.fallback)? shim.Buffer.from(await shim.subtle.digest({name: 'SHA-256'}, new shim.TextEncoder().encode(S.parse(json.m)))) : await sha(json.m); // this line is old bad buggy code but necessary for old compatibility.
-			var buf; var sig; var check; try{
-				buf = shim.Buffer.from(json.s, opt.encode || 'base64') // NEW DEFAULT!
-				sig = new Uint8Array(buf)
-				check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash))
-				if(!check){ throw "Signature did not match." }
-			}catch(e){
-				buf = shim.Buffer.from(json.s, 'utf8') // AUTO BACKWARD OLD UTF8 DATA!
-				sig = new Uint8Array(buf)
-				check = await (shim.ossl || shim.subtle).verify(S.ecdsa.sign, key, sig, new Uint8Array(hash))
-				if(!check){ throw "Signature did not match." }
-			}
-			var r = check? S.parse(json.m) : u;
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		}
-		SEA.opt.fallback = 2;
+			result = SEA.verify;
+			return SEA.verify;
+		};
 
 	}).END();
 
@@ -523,90 +554,102 @@
 	}).END();
 
 	USE('./encrypt', function(module){
-		var SEA = USE('./sea');
 		var shim = USE('./shim');
 		var aeskey = USE('./aeskey');
 		var u;
 
-		SEA.encrypt = SEA.encrypt || (async (data, pair, cb, opt) => { try {
-			opt = opt || {};
-			var key = (pair||opt).epriv || pair;
-			if(u === data){ throw '`undefined` not allowed.' }
-			if(!key){
-				pair = await SEA.I(null, {what: data, how: 'encrypt', why: opt.why});
-				key = pair.epriv || pair;
-			}
-			var msg = (typeof data == 'string')? data : JSON.stringify(data);
-			var rand = {s: shim.random(9), iv: shim.random(15)}; // consider making this 9 and 15 or 18 or 12 to reduce == padding.
-			var ct = await aeskey(key, rand.s, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).encrypt({ // Keeping the AES key scope as private as possible...
-				name: opt.name || 'AES-GCM', iv: new Uint8Array(rand.iv)
-			}, aes, new shim.TextEncoder().encode(msg)));
-			var r = {
-				ct: shim.Buffer.from(ct, 'binary').toString(opt.encode || 'base64'),
-				iv: rand.iv.toString(opt.encode || 'base64'),
-				s: rand.s.toString(opt.encode || 'base64')
-			}
-			if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+		let result;
+		module.exports = (SEA) => {
+			if (result) return result;
 
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		} catch(e) {
-			console.log(e);
-			SEA.err = e;
-			if(SEA.throw){ throw e }
-			if(cb){ cb() }
-			return;
-		}});
+			SEA.encrypt = SEA.encrypt || (async (data, pair, cb, opt) => { try {
+				opt = opt || {};
+				var key = (pair||opt).epriv || pair;
+				if(u === data){ throw '`undefined` not allowed.' }
+				if(!key){
+					pair = await SEA.I(null, {what: data, how: 'encrypt', why: opt.why});
+					key = pair.epriv || pair;
+				}
+				var msg = (typeof data == 'string')? data : JSON.stringify(data);
+				var rand = {s: shim.random(9), iv: shim.random(15)}; // consider making this 9 and 15 or 18 or 12 to reduce == padding.
+				var ct = await aeskey(key, rand.s, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).encrypt({ // Keeping the AES key scope as private as possible...
+					name: opt.name || 'AES-GCM', iv: new Uint8Array(rand.iv)
+				}, aes, new shim.TextEncoder().encode(msg)));
+				var r = {
+					ct: shim.Buffer.from(ct, 'binary').toString(opt.encode || 'base64'),
+					iv: rand.iv.toString(opt.encode || 'base64'),
+					s: rand.s.toString(opt.encode || 'base64')
+				}
+				if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
 
-		module.exports = SEA.encrypt;
+				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+				return r;
+			} catch(e) {
+				console.log(e);
+				SEA.err = e;
+				if(SEA.throw){ throw e }
+				if(cb){ cb() }
+				return;
+			}});
+
+			result = SEA.encrypt;
+			return SEA.encrypt;
+		};
 	}).END();
 
 	USE('./decrypt', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
-		var aeskey = USE('./aeskey');
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const aeskey = USE('./aeskey');
 
-		SEA.decrypt = SEA.decrypt || (async (data, pair, cb, opt) => { try {
-			opt = opt || {};
-			var key = (pair||opt).epriv || pair;
-			if(!key){
-				pair = await SEA.I(null, {what: data, how: 'decrypt', why: opt.why});
-				key = pair.epriv || pair;
-			}
-			var json = S.parse(data);
-			var buf, bufiv, bufct; try{
-				buf = shim.Buffer.from(json.s, opt.encode || 'base64');
-				bufiv = shim.Buffer.from(json.iv, opt.encode || 'base64');
-				bufct = shim.Buffer.from(json.ct, opt.encode || 'base64');
-				var ct = await aeskey(key, buf, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).decrypt({  // Keeping aesKey scope as private as possible...
-					name: opt.name || 'AES-GCM', iv: new Uint8Array(bufiv)
-				}, aes, new Uint8Array(bufct)));
-			}catch(e){
-				if('utf8' === opt.encode){ throw "Could not decrypt" }
-				if(SEA.opt.fallback){
-					opt.encode = 'utf8';
-					return await SEA.decrypt(data, pair, cb, opt);
+		let result;
+		module.exports = (SEA) => {
+			if (result) return result;
+			const S = settings(SEA);
+
+			SEA.decrypt = SEA.decrypt || (async (data, pair, cb, opt) => { try {
+				opt = opt || {};
+				var key = (pair||opt).epriv || pair;
+				if(!key){
+					pair = await SEA.I(null, {what: data, how: 'decrypt', why: opt.why});
+					key = pair.epriv || pair;
 				}
-			}
-			var r = S.parse(new shim.TextDecoder('utf8').decode(ct));
-			if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-			return r;
-		} catch(e) {
-			console.log(e);
-			SEA.err = e;
-			if(SEA.throw){ throw e }
-			if(cb){ cb() }
-			return;
-		}});
+				var json = S.parse(data);
+				var buf, bufiv, bufct; try{
+					buf = shim.Buffer.from(json.s, opt.encode || 'base64');
+					bufiv = shim.Buffer.from(json.iv, opt.encode || 'base64');
+					bufct = shim.Buffer.from(json.ct, opt.encode || 'base64');
+					var ct = await aeskey(key, buf, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).decrypt({  // Keeping aesKey scope as private as possible...
+						name: opt.name || 'AES-GCM', iv: new Uint8Array(bufiv)
+					}, aes, new Uint8Array(bufct)));
+				}catch(e){
+					if('utf8' === opt.encode){ throw "Could not decrypt" }
+					if(SEA.opt.fallback){
+						opt.encode = 'utf8';
+						return await SEA.decrypt(data, pair, cb, opt);
+					}
+				}
+				var r = S.parse(new shim.TextDecoder('utf8').decode(ct));
+				if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+				return r;
+			} catch(e) {
+				console.log(e);
+				SEA.err = e;
+				if(SEA.throw){ throw e }
+				if(cb){ cb() }
+				return;
+			}});
 
-		module.exports = SEA.decrypt;
+			result = SEA.decrypt;
+			return SEA.decrypt;
+		};
 	}).END();
 
 	USE('./secret', function(module){
-		var SEA = USE('./sea');
-		var shim = USE('./shim');
-		var S = USE('./settings');
+		const SEA = USE('./sea');
+		const shim = USE('./shim');
+		const settings = USE('./settings');
+		const S = settings(SEA);
 		// Derive shared secret from other's pub and my epub/epriv
 		SEA.secret = SEA.secret || (async (key, pair, cb, opt) => { try {
 			opt = opt || {};
@@ -655,35 +698,29 @@
 	}).END();
 
 	USE('./sea', function(module){
-		var SEA = {};
-		var shim = USE('./shim');
+		const shim = USE('./shim');
 		// Practical examples about usage found from ./test/common.js
-		var work = USE('./work');
-		var sign = USE('./sign');
-		var verify = USE('./verify');
-		var encrypt = USE('./encrypt');
-		var decrypt = USE('./decrypt');
-		var Buffer = USE('./buffer');
+		const getWork = USE('./work');
+		const getSign = USE('./sign');
+		const getVerify = USE('./verify');
+		const getEncrypt = USE('./encrypt');
+		const getDecrypt = USE('./decrypt');
+		const Buffer = USE('./buffer');
 
-		SEA.work = work;
-		SEA.sign = sign;
-		SEA.verify = verify;
-		SEA.encrypt = encrypt;
-		SEA.decrypt = decrypt;
-
-		SEA.random = SEA.random || shim.random;
-
-		// This is Buffer used in SEA and usable from Gun/SEA application also.
-		// For documentation see https://nodejs.org/api/buffer.html
-		SEA.Buffer = SEA.Buffer || Buffer;
-
-		// These SEA functions support now ony Promises or
-		// async/await (compatible) code, use those like Promises.
-		//
-		// Creates a wrapper library around Web Crypto API
-		// for various AES, ECDSA, PBKDF2 functions we called above.
-		// Calculate public key KeyID aka PGPv4 (result: 8 bytes as hex string)
-		SEA.keyid = SEA.keyid || (async (pub) => {
+		const SEA = { Buffer };
+		SEA.work = getWork(SEA);
+		SEA.sign = getSign(SEA);
+		SEA.verify = getVerify(SEA);
+		SEA.encrypt = getEncrypt(SEA);
+		SEA.decrypt = getDecrypt(SEA);
+		SEA.random = SEA.random || shim.random,
+			// These SEA functions support now ony Promises or
+			// async/await (compatible) code, use those like Promises.
+			//
+			// Creates a wrapper library around Web Crypto API
+			// for various AES, ECDSA, PBKDF2 functions we called above.
+			// Calculate public key KeyID aka PGPv4 (result: 8 bytes as hex string)
+		SEA.keyid = async (pub) => {
 			try {
 				// base64('base64(x):base64(y)') => Buffer(xy)
 				const pb = Buffer.concat(
@@ -696,12 +733,18 @@
 				])
 				const sha1 = await sha1hash(id)
 				const hash = Buffer.from(sha1, 'binary')
-				return hash.toString('hex', hash.length - 8)  // 16-bit ID as hex
+				return hash.toString('hex', hash.length - 8) // 16-bit ID as hex
 			} catch (e) {
 				console.log(e)
 				throw e
 			}
-		});
+		};
+
+		module.exports = SEA;
+
+		// This is Buffer used in SEA and usable from Gun/SEA application also.
+		// For documentation see https://nodejs.org/api/buffer.html
+
 		// all done!
 		// Obviously it is missing MANY necessary features. This is only an alpha release.
 		// Please experiment with it, audit what I've done so far, and complain about what needs to be added.
@@ -721,8 +764,6 @@
 
 		// 	return Gun.SEA;
 		// };
-		module.exports = SEA;
-
 	}).END();
 
 	USE('./then', function(module){

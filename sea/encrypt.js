@@ -1,36 +1,41 @@
-import SEA from './sea';
 import shim from './shim';
 import aeskey from './aeskey';
 var u;
 
-SEA.encrypt = SEA.encrypt || (async (data, pair, cb, opt) => { try {
-	opt = opt || {};
-	var key = (pair||opt).epriv || pair;
-	if(u === data){ throw '`undefined` not allowed.' }
-	if(!key){
-		pair = await SEA.I(null, {what: data, how: 'encrypt', why: opt.why});
-		key = pair.epriv || pair;
-	}
-	var msg = (typeof data == 'string')? data : JSON.stringify(data);
-	var rand = {s: shim.random(9), iv: shim.random(15)}; // consider making this 9 and 15 or 18 or 12 to reduce == padding.
-	var ct = await aeskey(key, rand.s, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).encrypt({ // Keeping the AES key scope as private as possible...
-		name: opt.name || 'AES-GCM', iv: new Uint8Array(rand.iv)
-	}, aes, new shim.TextEncoder().encode(msg)));
-	var r = {
-		ct: shim.Buffer.from(ct, 'binary').toString(opt.encode || 'base64'),
-		iv: rand.iv.toString(opt.encode || 'base64'),
-		s: rand.s.toString(opt.encode || 'base64')
-	}
-	if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
+let result;
+export default (SEA) => {
+	if (result) return result;
 
-	if(cb){ try{ cb(r) }catch(e){console.log(e)} }
-	return r;
-} catch(e) {
-	console.log(e);
-	SEA.err = e;
-	if(SEA.throw){ throw e }
-	if(cb){ cb() }
-	return;
-}});
+	SEA.encrypt = SEA.encrypt || (async (data, pair, cb, opt) => { try {
+		opt = opt || {};
+		var key = (pair||opt).epriv || pair;
+		if(u === data){ throw '`undefined` not allowed.' }
+		if(!key){
+			pair = await SEA.I(null, {what: data, how: 'encrypt', why: opt.why});
+			key = pair.epriv || pair;
+		}
+		var msg = (typeof data == 'string')? data : JSON.stringify(data);
+		var rand = {s: shim.random(9), iv: shim.random(15)}; // consider making this 9 and 15 or 18 or 12 to reduce == padding.
+		var ct = await aeskey(key, rand.s, opt).then((aes) => (/*shim.ossl ||*/ shim.subtle).encrypt({ // Keeping the AES key scope as private as possible...
+			name: opt.name || 'AES-GCM', iv: new Uint8Array(rand.iv)
+		}, aes, new shim.TextEncoder().encode(msg)));
+		var r = {
+			ct: shim.Buffer.from(ct, 'binary').toString(opt.encode || 'base64'),
+			iv: rand.iv.toString(opt.encode || 'base64'),
+			s: rand.s.toString(opt.encode || 'base64')
+		}
+		if(!opt.raw){ r = 'SEA'+JSON.stringify(r) }
 
-export default SEA.encrypt;
+		if(cb){ try{ cb(r) }catch(e){console.log(e)} }
+		return r;
+	} catch(e) {
+		console.log(e);
+		SEA.err = e;
+		if(SEA.throw){ throw e }
+		if(cb){ cb() }
+		return;
+	}});
+
+	result = SEA.encrypt;
+	return SEA.encrypt;
+};

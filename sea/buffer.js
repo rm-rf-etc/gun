@@ -1,3 +1,4 @@
+import { atob } from './base64';
 // This is Buffer implementation used in SEA. Functionality is mostly
 // compatible with NodeJS 'safe-buffer' and is used for encoding conversions
 // between binary and 'hex' | 'utf8' | 'base64'

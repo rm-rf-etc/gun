@@ -1,6 +1,7 @@
 import SEA from './sea';
 import shim from './shim';
-import S from './settings';
+import settings from './settings';
+const S = settings(SEA);
 
 SEA.name = SEA.name || (async (cb, opt) => { try {
 	if(cb){ try{ cb() }catch(e){console.log(e)} }

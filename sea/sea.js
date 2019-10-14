@@ -1,32 +1,26 @@
-var SEA = {};
 import shim from './shim';
 // Practical examples about usage found from ./test/common.js
-import work from './work';
-import sign from './sign';
-import verify from './verify';
-import encrypt from './encrypt';
-import decrypt from './decrypt';
+import getWork from './work';
+import getSign from './sign';
+import getVerify from './verify';
+import getEncrypt from './encrypt';
+import getDecrypt from './decrypt';
 import Buffer from './buffer';
 
-SEA.work = work;
-SEA.sign = sign;
-SEA.verify = verify;
-SEA.encrypt = encrypt;
-SEA.decrypt = decrypt;
-
-SEA.random = SEA.random || shim.random;
-
-// This is Buffer used in SEA and usable from Gun/SEA application also.
-// For documentation see https://nodejs.org/api/buffer.html
-SEA.Buffer = SEA.Buffer || Buffer;
-
-// These SEA functions support now ony Promises or
-// async/await (compatible) code, use those like Promises.
-//
-// Creates a wrapper library around Web Crypto API
-// for various AES, ECDSA, PBKDF2 functions we called above.
-// Calculate public key KeyID aka PGPv4 (result: 8 bytes as hex string)
-SEA.keyid = SEA.keyid || (async (pub) => {
+const SEA = { Buffer };
+SEA.work = getWork(SEA);
+SEA.sign = getSign(SEA);
+SEA.verify = getVerify(SEA);
+SEA.encrypt = getEncrypt(SEA);
+SEA.decrypt = getDecrypt(SEA);
+SEA.random = SEA.random || shim.random,
+	// These SEA functions support now ony Promises or
+	// async/await (compatible) code, use those like Promises.
+	//
+	// Creates a wrapper library around Web Crypto API
+	// for various AES, ECDSA, PBKDF2 functions we called above.
+	// Calculate public key KeyID aka PGPv4 (result: 8 bytes as hex string)
+SEA.keyid = async (pub) => {
 	try {
 		// base64('base64(x):base64(y)') => Buffer(xy)
 		const pb = Buffer.concat(
@@ -39,12 +33,18 @@ SEA.keyid = SEA.keyid || (async (pub) => {
 		])
 		const sha1 = await sha1hash(id)
 		const hash = Buffer.from(sha1, 'binary')
-		return hash.toString('hex', hash.length - 8)  // 16-bit ID as hex
+		return hash.toString('hex', hash.length - 8) // 16-bit ID as hex
 	} catch (e) {
 		console.log(e)
 		throw e
 	}
-});
+};
+
+export default SEA;
+
+// This is Buffer used in SEA and usable from Gun/SEA application also.
+// For documentation see https://nodejs.org/api/buffer.html
+
 // all done!
 // Obviously it is missing MANY necessary features. This is only an alpha release.
 // Please experiment with it, audit what I've done so far, and complain about what needs to be added.
@@ -64,4 +64,3 @@ SEA.keyid = SEA.keyid || (async (pub) => {
 
 // 	return Gun.SEA;
 // };
-export default SEA;

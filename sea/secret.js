@@ -1,6 +1,7 @@
 import SEA from './sea';
 import shim from './shim';
-import S from './settings';
+import settings from './settings';
+const S = settings(SEA);
 // Derive shared secret from other's pub and my epub/epriv
 SEA.secret = SEA.secret || (async (key, pair, cb, opt) => { try {
 	opt = opt || {};
