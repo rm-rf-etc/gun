@@ -1,24 +1,20 @@
 import fs from 'fs';
-import expect from 'expect';
+import expect from 'expect.js';
 import fsrm from '../../lib/fsrm';
 import initStore from '../../lib/store';
 import initSEA from '../../sea';
 import Gun from '../../src';
+// import rfs from '../../lib/rfs';
 
 const globalThis = Function('return this')();
 
 try{ globalThis.localStorage.clear() }catch(e){}
 try{ indexedDB.deleteDatabase('radatatest') }catch(e){}
-if (globalThis.Gun) {
-  globalThis.Gun.TESTING = true;
-} else {
-  try{ fs.unlinkSync('data.json') }catch(e){}
-  try{ fsrm('radatatest') }catch(e){}
-  globalThis.Gun = Gun;
-  globalThis.Gun.TESTING = true;
-  initStore(Gun);
-  // require('../../lib/rfs'); // doesn't appear to do anything
-}
+globalThis.Gun = globalThis.Gun || Gun;
+globalThis.Gun.TESTING = true;
+try{ fs.unlinkSync('data.json') }catch(e){}
+try{ fsrm('radatatest') }catch(e){}
+initStore(Gun);
 
 if(!globalThis.Gun.SEA){
   initSEA(Gun);

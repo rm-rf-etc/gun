@@ -1,61 +1,33 @@
-// import Gun from '../dist/gun';
-// import fs from 'fs';
-// import fsrm from '../lib/fsrm';
-// import serve from '../lib/serve';
-// import initStore from '../lib/store';
+import Gun from '../dist/gun';
+import fs from 'fs';
+import fsrm from '../lib/fsrm';
+import serve from '../lib/serve';
+import initStore from '../lib/store';
+import expect from 'expect.js';
+
+console.log('common-test.js');
+
+const globalThis = Function('return this')();
+
+// var opt = {};
+// opt.file = 'radatatest';
+// opt.store = rfs(opt); // store(Gun);
+// opt.chunk = 1000;
+// const Radisk = GetRadisk(Gun, GetRadix);
+// Radisk(opt);
 
 describe('Gun', function() {
-	var root;
-	(function(){
-		var env;
-		if(typeof global !== 'undefined'){ env = global }
-		if(typeof window !== 'undefined'){ env = window }
-		root = env.window? env.window : global;
-		try{ env.window && root.localStorage && root.localStorage.clear() }catch(e){}
-		try{ localStorage.clear() }catch(e){}
-		try{ indexedDB.deleteDatabase('radatatest') }catch(e){}
-		try{ require('fs').unlinkSync('data.json') }catch(e){}
-		try{ require('../lib/fsrm')('radatatest') }catch(e){}
-		//root.Gun = root.Gun || require('../gun');
-		if(root.Gun){
-			root.Gun = root.Gun;
-			root.Gun.TESTING = true;
-		} else {
-			root.Gun = require('../dist/gun').default;
-			root.Gun.TESTING = true;
-			Gun.serve = require('../lib/serve');
-			//require('../lib/file');
-			require('../lib/store');
-			require('../lib/rfs');
-			require('./rad/rad.js');
-			require('./sea/sea.js');
-		}
-	}());
-	//Gun.log.squelch = true;
-	var gleak = {globals: {}, check: function(){ // via tobyho
-	  var leaked = []
-	  for (var key in gleak.globe){ if (!(key in gleak.globals)){ leaked.push(key)} }
-	  if (leaked.length > 0){ console.log("GLOBAL LEAK!", leaked); return leaked }
-	}};
-	(function(env){
-		for (var key in (gleak.globe = env)){ gleak.globals[key] = true }
-	}(this));
-
 	var t = {};
-	// try{ root.localStorage && root.localStorage.clear() }catch(e){}
-	// try{ localStorage.clear() }catch(e){}
-	// try{ indexedDB.deleteDatabase('radatatest') }catch(e){}
-	// try{ fs.unlinkSync('data.json') }catch(e){}
-  	// try{ fsrm('radatatest') }catch(e){}
-	// if(root.Gun){
-	// 	root.Gun.TESTING = true;
-	// } else {
-	// 	root.Gun = Gun;
-	// 	root.Gun.TESTING = true;
-	// 	Gun.serve = serve;
-	// 	initStore(Gun);
-	// 	// require('../lib/rfs'); // doesn't appear to do anything
-	// }
+	try{ globalThis.localStorage && globalThis.localStorage.clear() }catch(e){}
+	try{ localStorage.clear() }catch(e){}
+	try{ indexedDB.deleteDatabase('radatatest') }catch(e){}
+	try{ fs.unlinkSync('data.json') }catch(e){}
+  	try{ fsrm('radatatest') }catch(e){}
+	globalThis.Gun = globalThis.Gun || Gun;
+	globalThis.Gun.TESTING = true;
+	Gun.serve = serve;
+	initStore(Gun);
+	// rfs();
 
 	describe('Utility', function() {
 		var u;
@@ -83,7 +55,7 @@ describe('Gun', function() {
 		} );
 		*/
 
-		describe('Type Check', function() {
+		describe.only('Type Check', function() {
 			it('binary', function() {
 				expect(Gun.bi.is(false)).to.be(true);
 				expect(Gun.bi.is(true)).to.be(true);
@@ -580,7 +552,6 @@ describe('Gun', function() {
 					f({hello: 'world'});
 				}, 100);
 			});
-
 			/*
 
 			Why is there code here to mutate `Gun` outside of a test?

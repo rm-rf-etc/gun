@@ -1,13 +1,13 @@
 import fs from 'fs';
-import expect from 'expect';
+import expect from 'expect.js';
 import fsrm from '../../lib/fsrm';
 // import store from '../../lib/store';
-// import rfs from '../../lib/rfs';
+import rfs from '../../lib/rfs';
 import Gun from '../../dist/gun';
 import GetRadix from '../../lib/radix';
 import GetRadisk from '../../lib/radisk';
 
-const Radisk = GetRadisk(Gun, GetRadix);
+console.log('rad/rad/js');
 
 //   var env;
 //   if(typeof global !== 'undefined'){ env = global }
@@ -26,7 +26,9 @@ if(globalThis.Gun){
     globalThis.Gun.TESTING = true;
     //require('../lib/file');
     // require('../../lib/store');
+    // store(Gun);
     // require('../../lib/rfs');
+    // rfs({});
 }
 
 // try{ global.expect = require("../expect") }catch(e){}
@@ -38,11 +40,14 @@ try{ globalThis.expect = expect }catch(e){}
 var opt = {};
 opt.file = 'radatatest';
 // var Radisk = (Gun.window && Gun.window.Radisk) || require('../../lib/radisk');
+
 // opt.store = Gun && RindexedDB ? rfs(opt) : null;
-// opt.store = store(Gun);
+opt.store = rfs(opt); // store(Gun);
 opt.chunk = 1000;
-var Radix = Radisk.Radix;
-var rad = Radisk(opt), esc = String.fromCharCode(27);
+const Radisk = GetRadisk(Gun, GetRadix);
+const rad = Radisk(opt);
+const Radix = Radisk.Radix;
+// var esc = String.fromCharCode(27);
 
 describe('RAD', function(){
 
