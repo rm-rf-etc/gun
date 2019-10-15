@@ -13,7 +13,7 @@ var root;
   if(root.Gun){
     root.Gun = root.Gun;
   } else {
-    var expect = global.expect = require("./expect");
+    var expect = global.expect = require("expect.js");
     root.Gun = require('../gun');
     Gun.serve = require('../lib/serve');
     //require('./s3');

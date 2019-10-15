@@ -1,5 +1,5 @@
 console.log("radix.js");
-var expect = global.expect = require("./expect");
+var expect = global.expect = require("expect.js");
 
 var Radix = require('../lib/radix');
 var _ = String.fromCharCode(29);

@@ -20,7 +20,7 @@ var Gun;
     require('../../lib/rfs');
   }
 
-  try{ var expect = global.expect = require("../expect") }catch(e){}
+  try{ var expect = global.expect = require("expect.js") }catch(e){}
 
   if(!root.Gun.SEA){
     require('../../sea.js');

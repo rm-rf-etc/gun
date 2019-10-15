@@ -19,7 +19,7 @@ var Gun;
     require('../../lib/rfs');
   }
 
-  try{ global.expect = require("../expect") }catch(e){}
+  try{ global.expect = require("expect.js") }catch(e){}
 
 }(this));
 

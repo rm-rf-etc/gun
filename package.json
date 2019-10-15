@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "aws-sdk": ">=2.153.0",
+    "expect.js": "^0.3.1",
     "ip": "^1.1.5",
     "mocha": "^6.2.0",
     "mock-local-storage": "^1.1.8",

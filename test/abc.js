@@ -1,3 +1,3 @@
 console.log("abc.js");
-var expect = global.expect = require("./expect");
+var expect = global.expect = require("expect.js");
 require('./common');
