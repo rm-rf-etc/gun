@@ -8,8 +8,8 @@
     "start": "node examples/http.js",
     "https": "HTTPS_KEY=test/https/server.key HTTPS_CERT=test/https/server.crt npm start",
     "prepublishOnly": "npm run unbuild",
-    "test": "mocha",
-    "test:dist": "TEST_TARGET=DIST mocha './test-dist/*.js'",
+    "test": "mocha -r esm",
+    "test:dist": "TEST_TARGET=DIST mocha -r esm",
     "testsea": "mocha test/sea.js",
     "testaxe": "mocha test/axe/holy-grail.js",
     "e2e": "mocha e2e/distributed.js",
@@ -61,6 +61,7 @@
   },
   "devDependencies": {
     "aws-sdk": ">=2.153.0",
+    "esm": "^3.2.25",
     "expect.js": "^0.3.1",
     "ip": "^1.1.5",
     "mocha": "^6.2.0",

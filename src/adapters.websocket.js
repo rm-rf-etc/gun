@@ -9,10 +9,10 @@ Gun.on('opt', function(root){
 	if(root.once){ return }
 	if(false === opt.WebSocket){ return }
 
-	var env;
-	if(typeof window !== "undefined"){ env = window }
-	if(typeof global !== "undefined"){ env = global }
-	env = env || {};
+	const env = Function('return this')();
+	// if(typeof window !== "undefined"){ env = window }
+	// if(typeof global !== "undefined"){ env = global }
+	// env = env || {};
 
 	var websocket = opt.WebSocket || env.WebSocket || env.webkitWebSocket || env.mozWebSocket;
 	if(!websocket){ return }

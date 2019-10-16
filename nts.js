@@ -1,14 +1,17 @@
+const Gun = require('./lib/require-gun');
+console.log('nts.js');
+
 ;(function(){
 	// NOTE: While the algorithm is P2P,
 	// the current implementation is one sided,
 	// only browsers self-modify, servers do not.
 	// Need to fix this! Since WebRTC is now working.
-	var env;
-	if(typeof global !== "undefined"){ env = global }
-	if(typeof window !== "undefined"){ var Gun = (env = window).Gun }
-	else {
-	if(typeof require !== "undefined"){ var Gun = require('./gun') }
-	}
+	const env = Function('return this')();
+	// if(typeof global !== "undefined"){ env = global }
+	// if(typeof window !== "undefined"){ var Gun = (env = window).Gun }
+	// else {
+	// if(typeof require !== "undefined"){ var Gun = require('./gun') }
+	// }
 
 	Gun.on('opt', function(ctx){
 		this.to.next(ctx);

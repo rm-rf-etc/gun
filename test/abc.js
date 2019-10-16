@@ -1,3 +1,5 @@
 console.log("abc.js");
-var expect = global.expect = require("expect.js");
+const gthis = Function('return this')();
+gthis.expect = require("expect.js");
+gthis.localStorage = gthis.localStorage || require('mock-local-storage');
 require('./common');

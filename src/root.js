@@ -73,7 +73,15 @@ Gun.chain.val = function(cb, opt){
 ;(function(){
 	Gun.on.put = function(msg, gun){
 		var at = gun._, ctx = {$: gun, graph: at.graph, put: {}, map: {}, souls: {}, machine: Gun.state(), ack: msg['@'], cat: at, stop: {}};
-		if(!Gun.graph.is(msg.put, null, verify, ctx)){ ctx.err = "Error: Invalid graph!" }
+		const someState = Gun.graph.is(msg.put, null, verify, ctx);
+
+		console.log('msg.put', msg.put);
+		// console.log('ctx', ctx);
+		console.log('--------------------');
+		if (!someState) {
+			ctx.err = "Error: Invalid graph!";
+		}
+
 		if(ctx.err){ return at.on('in', {'@': msg['#'], err: Gun.log(ctx.err) }) }
 		obj_map(ctx.put, merge, ctx);
 		if(!ctx.async){ obj_map(ctx.map, map, ctx) }
@@ -85,8 +93,9 @@ Gun.chain.val = function(cb, opt){
 		if(!ctx.diff){ return }
 		at.on('put', obj_to(msg, {put: ctx.diff}));
 	};
-	function verify(val, key, node, soul){ var ctx = this;
-		var state = Gun.state.is(node, key), tmp;
+	function verify(val, key, node, soul){
+		var ctx = this;
+		var state = Gun.state.is(node, key);
 		if(!state){ return ctx.err = "Error: No state on '"+key+"' in node '"+soul+"'!" }
 		var vertex = ctx.graph[soul] || empty, was = Gun.state.is(vertex, key, true), known = vertex[key];
 		var HAM = Gun.HAM(ctx.machine, state, was, val, known);

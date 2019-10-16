@@ -685,16 +685,82 @@ describe('Gun', function(){
 				expect(Gun.is.lex('')).to.be(false);
 			});
 			it.skip('is lex ify',function(){
-				expect(Gun.is.lex.ify({'#': 'soul', '.': 'field', soul: 'foo', field: 'field', state: 0})).to.eql({'#': 'soul', '.': 'field', '>': 0});
+				expect(Gun.is.lex.ify({
+					'#': 'soul',
+					'.': 'field',
+					soul: 'foo',
+					field: 'field',
+					state: 0
+				})).to.eql({
+					'#': 'soul',
+					'.': 'field',
+					'>': 0
+				});
 			});
 			it('is node',function(){
 				var n;
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}})).to.be(true);
-				expect(Gun.node.is(n = {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}})).to.be(true);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}, g: Infinity})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false);
-				expect(Gun.node.is({_:{'#':'somesoulidhere'}, a:0, b: 1, x: [], c: '', d: 'e'})).to.be(false);
+				expect(Gun.node.is({
+					_: {
+						'#': 'somesoulidhere'
+					}
+				})).to.be(true);
+				expect(Gun.node.is(n = {
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					c: '',
+					d: 'e',
+					f: {
+						'#': 'somethingelsehere'
+					}
+				})).to.be(true);
+				expect(Gun.node.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					c: '',
+					d: 'e',
+					f: {
+						'#':'somethingelsehere'
+					},
+					g: Infinity
+				})).to.be(false);
+				expect(Gun.node.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					z: NaN,
+					c: '',
+					d: 'e'
+				})).to.be(false);
+				expect(Gun.node.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					y: {
+						_: 'cool'
+					},
+					c: '',
+					d: 'e'
+				})).to.be(false);
+				expect(Gun.node.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					x: [],
+					c: '',
+					d: 'e'
+				})).to.be(false);
 				expect(Gun.node.is({})).to.be(false);
 				expect(Gun.node.is({a:1})).to.be(false);
 				expect(Gun.node.is({_:{}})).to.be(false);
@@ -716,12 +782,68 @@ describe('Gun', function(){
 				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}}, foo: {_:{}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
 				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: Infinity, c: '', d: 'e', f: {'#':'somethingelsehere'}}})).to.be(false);
 				expect(Gun.graph.is({'somesoulidhere': {_:{'#':'somesoulidhere'}, a:0, b: Infinity, c: '', d: 'e', f: {'#':'somethingelsehere'}}, 'somethingelsehere': {_:{'#':'somethingelsehere'}}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, c: '', d: 'e', f: {'#':'somethingelsehere'}, g: Infinity})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, z: NaN, c: '', d: 'e'})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, y: {_: 'cool'}, c: '', d: 'e'})).to.be(false);
-				expect(Gun.graph.is({_:{'#':'somesoulidhere'}, a:0, b: 1, x: [], c: '', d: 'e'})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere',
+					}
+				})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a:0,
+					b: 1,
+					c: '',
+					d: 'e',
+					f: {
+						'#': 'somethingelsehere'
+					}
+				})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a: 0,
+					b: 1,
+					c: '',
+					d: 'e',
+					f: {
+						'#': 'somethingelsehere'
+					},
+					g: Infinity
+				})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a: 0,
+					b: 1,
+					z: NaN,
+					c: '',
+					d: 'e'
+				})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a: 0,
+					b: 1,
+					y: {
+						_: 'cool'
+					},
+					c: '',
+					d: 'e'
+				})).to.be(false);
+				expect(Gun.graph.is({
+					_: {
+						'#': 'somesoulidhere'
+					},
+					a: 0,
+					b: 1,
+					x: [],
+					c: '',
+					d: 'e'
+				})).to.be(false);
 				expect(Gun.graph.is({})).to.be(false); // Empty graph is not a graph :(
 				expect(Gun.graph.is({a:1})).to.be(false);
 				expect(Gun.graph.is({_:{}})).to.be(false);
@@ -781,6 +903,7 @@ describe('Gun', function(){
 				cat.slave = bob;
 				cat.master = alice;
 				var graph = Gun.graph.ify(bob);
+
 				expect(graph).to.eql({
 					'ASDF': {_:{'#':'ASDF'},
 						age: 27,
@@ -805,7 +928,7 @@ describe('Gun', function(){
 			});
 		});
 	});
-	describe('ify', function(){
+	describe.skip('ify', function(){
 		console.log("TODO: BUG! Upgrade IFY tests to new internal API!");
 		return;
 
@@ -917,7 +1040,7 @@ describe('Gun', function(){
 		expect(test.err.meta).to.be.ok(); // TODO: Fail: this passes, somehow? Fix ify code!
 	});
 
-	describe('Schedule', function(){
+	describe.skip('Schedule', function(){
 		console.log("TODO: BUG! Upgrade SCHEDULE tests to new internal API!");
 		return;
 		it('one', function(done){
@@ -944,7 +1067,7 @@ describe('Gun', function(){
 		});
 	});
 
-	describe('Union', function(){
+	describe.skip('Union', function(){
 		console.log("TODO: BUG! Upgrade UNION tests to new internal API!");
 		return;
 		var gun = Gun();
@@ -1269,7 +1392,7 @@ describe('Gun', function(){
 		});
 	});
 
-	describe('API', function(){
+	describe.only('API', function(){
 		var gopt = {wire:{put:function(n,cb){cb()},get:function(k,cb){cb()}}};
 		if(Gun.window && location.search){
 			/*console.log("LOCALHOST PEER MUST BE ON!");
@@ -1388,7 +1511,7 @@ describe('Gun', function(){
 
 		});
 
-		describe('plural chains', function(){
+		describe.skip('plural chains', function(){
 			this.timeout(9000);
 			it('uncached synchronous map on', function(done){
 				/*
@@ -1800,7 +1923,10 @@ describe('Gun', function(){
 						},50);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/r'},
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/r',
+					},
 					alice: {_:{'#':'GALICE1'},
 						name: "alice",
 						age: 24,
@@ -1832,30 +1958,33 @@ describe('Gun', function(){
 
 			it("in memory get after", function(done){
 				var gun = Gun();
-				gun.put({_:{'#':'g/n/m/f/l/n'},
-						alice: {_:{'#':'GALICE2'},
-							name: "alice",
-							age: 24,
-							spouse: {
-								name: "carl",
-								age: 25,
-								work: {
-									name: "GUN INC"
-								}
-							},
-							bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n',
+					},
+					alice: {_:{'#':'GALICE2'},
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
 						},
-						bob: {
-							name: "bob",
-							age: 26,
-							spouse: {
-								name: "diana",
-								age: 27,
-								work: {
-									name: "ACME INC"
-								}
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {
+								name: "ACME INC"
 							}
 						}
+					}
 				});
 				var check = {};
 				//gun.get('g/n/m/f/l/n').get('bob.spouse.work').on(function(v,f){ console.log("!!!!!!!!!", f, v);});return;
@@ -1894,30 +2023,33 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/p'},
-						alice: {_:{'#':'GALICE3'},
-							name: "alice",
-							age: 24,
-							spouse: {
-								name: "carl",
-								age: 25,
-								work: {
-									name: "GUN INC"
-								}
-							},
-							bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/p',
+					},
+					alice: {_:{'#':'GALICE3'},
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
 						},
-						bob: {
-							name: "bob",
-							age: 26,
-							spouse: {
-								name: "diana",
-								age: 27,
-								work: {
-									name: "ACME INC"
-								}
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {
+								name: "ACME INC"
 							}
 						}
+					}
 				});
 				setTimeout(function(){
 					//console.debug.i=1;console.log("-------------");
@@ -1927,30 +2059,33 @@ describe('Gun', function(){
 
 			it("in memory get after map get", function(done){
 				var gun = Gun();
-				gun.put({_:{'#':'g/n/m/f/l/n/m/p'},
-						alice: {_:{'#':'GALICE4'},
-							name: "alice",
-							age: 24,
-							spouse: {
-								name: "carl",
-								age: 25,
-								work: {
-									name: "GUN INC"
-								}
-							},
-							bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/m/p',
+					},
+					alice: {_:{'#':'GALICE4'},
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
 						},
-						bob: {
-							name: "bob",
-							age: 26,
-							spouse: {
-								name: "diana",
-								age: 27,
-								work: {
-									name: "ACME INC"
-								}
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {
+								name: "ACME INC"
 							}
 						}
+					}
 				});
 				var check = {};
 				gun.get('g/n/m/f/l/n/m/p').map().get('name').on(function(v,f){
@@ -1988,30 +2123,33 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/p/p/p'},
-						alice: {
-							name: "alice",
-							age: 24,
-							spouse: {
-								name: "carl",
-								age: 25,
-								work: {
-									name: "GUN INC"
-								}
-							},
-							bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/p/p/p',
+					},
+					alice: {
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
 						},
-						bob: {
-							name: "bob",
-							age: 26,
-							spouse: {
-								name: "diana",
-								age: 27,
-								work: {_:{'#':'CCINEMA1'},
-									name: "ACME INC"
-								}
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {_:{'#':'CCINEMA1'},
+								name: "ACME INC"
 							}
 						}
+					}
 				});
 				setTimeout(function(){
 					//console.debug.i=1;console.log("----------------");
@@ -2021,30 +2159,33 @@ describe('Gun', function(){
 
 			it("in memory get after map get get", function(done){
 				var gun = Gun();
-				gun.put({_:{'#':'g/n/m/f/l/n/b/p/p/p/a'},
-						alice: {
-							name: "alice",
-							age: 24,
-							spouse: {
-								name: "carl",
-								age: 25,
-								work: {
-									name: "GUN INC"
-								}
-							},
-							bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/p/p/p/a',
+					},
+					alice: {
+						name: "alice",
+						age: 24,
+						spouse: {
+							name: "carl",
+							age: 25,
+							work: {
+								name: "GUN INC"
+							}
 						},
-						bob: {
-							name: "bob",
-							age: 26,
-							spouse: {
-								name: "diana",
-								age: 27,
-								work: {_:{'#':'CCINEMA2'},
-									name: "ACME INC"
-								}
+						bout: {huh:1}
+					},
+					bob: {
+						name: "bob",
+						age: 26,
+						spouse: {
+							name: "diana",
+							age: 27,
+							work: {_:{'#':'CCINEMA2'},
+								name: "ACME INC"
 							}
 						}
+					}
 				});
 				var check = {};
 				gun.get('g/n/m/f/l/n/b/p/p/p/a').map().get('spouse').get('work').on(function(v,f){
@@ -2088,34 +2229,37 @@ describe('Gun', function(){
 					}
 				});
 				//console.debug.i=1;console.log("------------------------");
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/a/m/m',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN"
-							},
-							ACME: {_:{'#':"CCINEMA3"},
-								name: "ACME"
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN"
+						},
+						ACME: {_:{'#':"CCINEMA3"},
+							name: "ACME"
+						}
+					}
 				});
 				setTimeout(function(){
 					//console.debug.i=1;console.log("-------------");
@@ -2125,34 +2269,37 @@ describe('Gun', function(){
 
 			it("in memory get after map map", function(done){
 				var gun = Gun();
-				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/m/m',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN"
-							},
-							ACME: {_:{'#':"CCINEMA4"},
-								name: "ACME"
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN"
+						},
+						ACME: {_:{'#':"CCINEMA4"},
+							name: "ACME"
+						}
+					}
 				});
 				var check = {};
 				gun.get('g/n/m/f/l/n/b/m/m').map().map().on(function(v,f){
@@ -2198,34 +2345,37 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/m/m/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN"
-							},
-							ACME: {_:{'#':"CCINEMA5"},
-								name: "ACME"
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN"
+						},
+						ACME: {_:{'#':"CCINEMA5"},
+							name: "ACME"
+						}
+					}
 				});
 				setTimeout(function(){
 					gun.get('CCINEMA5').put({name: "ACMEINC"});
@@ -2235,34 +2385,37 @@ describe('Gun', function(){
 			it("in memory get after map map get", function(done){
 				var gun = Gun();
 				var check = {};
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/a/m/m/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							spouse: {
+								name: "carl",
+								age: 25
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN"
-							},
-							ACME: {_:{'#':'CCINEMA6'},
-								name: "ACME"
+						bob: {
+							name: "bob",
+							age: 26,
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN"
+						},
+						ACME: {_:{'#':'CCINEMA6'},
+							name: "ACME"
+						}
+					}
 				});
 				gun.get('g/n/m/f/l/n/b/a/m/m/p').map().map().get('name').on(function(v,f){
 					check[v] = f;
@@ -2302,46 +2455,49 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {_:{'#':'QUANGO'},
-									state: "MA"
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/m/m/p/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {_:{'#':'QUANGO'},
+								state: "MA"
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: "TX"
-								},
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: "CA"
-								}
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: "TX"
 							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: "NY"
-								}
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: "CA"
+							}
+						},
+						ACME: {
+							name: "ACME",
+							address: {
+								state: "NY"
+							}
+						}
+					}
 				});
 				setTimeout(function(){
 					gun.get('QUANGO').put({state: 'QR'});
@@ -2350,46 +2506,49 @@ describe('Gun', function(){
 
 			it("in memory get after map map get get", function(done){
 				var gun = Gun();
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {_:{'#':'QUANGO1'},
-									state: "MA"
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/a/m/m/p/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {_:{'#':'QUANGO1'},
+								state: "MA"
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: "TX"
-								},
-								spouse: {
-									name: "diana",
-									age: 27
-								}
-							}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: "CA"
-								}
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: "TX"
 							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: "NY"
-								}
+							spouse: {
+								name: "diana",
+								age: 27
 							}
 						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: "CA"
+							}
+						},
+						ACME: {
+							name: "ACME",
+							address: {
+								state: "NY"
+							}
+						}
+					}
 				});
 				var check = {};
 				gun.get('g/n/m/f/l/n/b/a/m/m/p/p').map().map().get('address').get('state').on(function(v,f){
@@ -2431,66 +2590,69 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {
-									state: {_:{'#':'HIPPOM'},
-										code: "MA",
-										county: {
-											MA1: "First"
-										}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/m/m/p/p/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {
+								state: {_:{'#':'HIPPOM'},
+									code: "MA",
+									county: {
+										MA1: "First"
 									}
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+								}
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: {
-										code: "TX",
-										county: {
-											TX1: "First"
-										}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: {
+									code: "TX",
+									county: {
+										TX1: "First"
 									}
-								},
-								spouse: {
-									name: "diana",
-									age: 27
+								}
+							},
+							spouse: {
+								name: "diana",
+								age: 27
+							}
+						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: {
+									code: "CA",
+									county: {
+										CA1: "First"
+									}
 								}
 							}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: {
-										code: "CA",
-										county: {
-											CA1: "First"
-										}
-									}
-								}
-							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: {
-										code: "NY",
-										county: {
-											NY1: "First"
-										}
+						ACME: {
+							name: "ACME",
+							address: {
+								state: {
+									code: "NY",
+									county: {
+										NY1: "First"
 									}
 								}
 							}
 						}
+					}
 				});
 				setTimeout(function(){
 					gun.get('HIPPOM').put({code: 'QR'});
@@ -2500,66 +2662,69 @@ describe('Gun', function(){
 			it("in memory get before after map map get get get", function(done){
 				var gun = Gun();
 				var check = {};
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/p'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {
-									state: {_:{'#':'HIPPOM1'},
-										code: "MA",
-										county: {
-											MA1: "First"
-										}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/a/m/m/p/p/p',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {
+								state: {_:{'#':'HIPPOM1'},
+									code: "MA",
+									county: {
+										MA1: "First"
 									}
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+								}
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: {
-										code: "TX",
-										county: {
-											TX1: "First"
-										}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: {
+									code: "TX",
+									county: {
+										TX1: "First"
 									}
-								},
-								spouse: {
-									name: "diana",
-									age: 27
+								}
+							},
+							spouse: {
+								name: "diana",
+								age: 27
+							}
+						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: {
+									code: "CA",
+									county: {
+										CA1: "First"
+									}
 								}
 							}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: {
-										code: "CA",
-										county: {
-											CA1: "First"
-										}
-									}
-								}
-							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: {
-										code: "NY",
-										county: {
-											NY1: "First"
-										}
+						ACME: {
+							name: "ACME",
+							address: {
+								state: {
+									code: "NY",
+									county: {
+										NY1: "First"
 									}
 								}
 							}
 						}
+					}
 				});
 				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/p').map().map().get('address').get('state')
 					.get('code')
@@ -2602,66 +2767,69 @@ describe('Gun', function(){
 						},10);
 					}
 				});
-				gun.put({_:{'#':'g/n/m/f/l/n/b/m/m/p/p/n'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {
-									state: {_:{'#':'HIPPOM3'},
-										code: "MA",
-										county: {
-											MA1: "First"
-										}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/m/m/p/p/n',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {
+								state: {_:{'#':'HIPPOM3'},
+									code: "MA",
+									county: {
+										MA1: "First"
 									}
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+								}
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: {
-										code: "TX",
-										county: {
-											TX1: "First"
-										}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: {
+									code: "TX",
+									county: {
+										TX1: "First"
 									}
-								},
-								spouse: {
-									name: "diana",
-									age: 27
+								}
+							},
+							spouse: {
+								name: "diana",
+								age: 27
+							}
+						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: {
+									code: "CA",
+									county: {
+										CA1: "First"
+									}
 								}
 							}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: {
-										code: "CA",
-										county: {
-											CA1: "First"
-										}
-									}
-								}
-							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: {
-										code: "NY",
-										county: {
-											NY1: "First"
-										}
+						ACME: {
+							name: "ACME",
+							address: {
+								state: {
+									code: "NY",
+									county: {
+										NY1: "First"
 									}
 								}
 							}
 						}
+					}
 				});
 				setTimeout(function(){
 					gun.get('HIPPOM3').put({code: 'QR'});
@@ -2671,66 +2839,69 @@ describe('Gun', function(){
 			it("in memory get before after map map get get node", function(done){
 				var gun = Gun();
 				var check = {};
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/n'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {
-									state: {_:{'#':'HIPPOM4'},
-										code: "MA",
-										county: {
-											MA1: "First"
-										}
+				gun.put({
+					_: {
+						'#':'g/n/m/f/l/n/b/a/m/m/p/p/n',
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {
+								state: {_:{'#':'HIPPOM4'},
+									code: "MA",
+									county: {
+										MA1: "First"
 									}
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+								}
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: {
-										code: "TX",
-										county: {
-											TX1: "First"
-										}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: {
+									code: "TX",
+									county: {
+										TX1: "First"
 									}
-								},
-								spouse: {
-									name: "diana",
-									age: 27
+								}
+							},
+							spouse: {
+								name: "diana",
+								age: 27
+							}
+						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: {
+									code: "CA",
+									county: {
+										CA1: "First"
+									}
 								}
 							}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: {
-										code: "CA",
-										county: {
-											CA1: "First"
-										}
-									}
-								}
-							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: {
-										code: "NY",
-										county: {
-											NY1: "First"
-										}
+						ACME: {
+							name: "ACME",
+							address: {
+								state: {
+									code: "NY",
+									county: {
+										NY1: "First"
 									}
 								}
 							}
 						}
+					}
 				});
 				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/n').map().map().get('address').get('state').on(function(v,f){
 					check[v.code] = f;
@@ -2755,70 +2926,73 @@ describe('Gun', function(){
 			it("in memory get after map map get get get map", function(done){
 				var gun = Gun();
 				var check = {};
-				gun.put({_:{'#':'g/n/m/f/l/n/b/a/m/m/p/p/p/n'},
-						users: {
-							alice: {
-								name: "alice",
-								age: 24,
-								address: {
-									state: {
-										code: "MA",
-										county: {
-											MA1: "First"
-											,MA2: "Second"
-										}
+				gun.put({
+					_: {
+						'#': 'g/n/m/f/l/n/b/a/m/m/p/p/p/n'
+					},
+					users: {
+						alice: {
+							name: "alice",
+							age: 24,
+							address: {
+								state: {
+									code: "MA",
+									county: {
+										MA1: "First"
+										,MA2: "Second"
 									}
-								},
-								spouse: {
-									name: "carl",
-									age: 25
-								},
-								bout: {huh:1}
+								}
 							},
-							bob: {
-								name: "bob",
-								age: 26,
-								address: {
-									state: {
-										code: "TX",
-										county: {
-											TX1: "First"
-											,TX2: "Second"
-										}
+							spouse: {
+								name: "carl",
+								age: 25
+							},
+							bout: {huh:1}
+						},
+						bob: {
+							name: "bob",
+							age: 26,
+							address: {
+								state: {
+									code: "TX",
+									county: {
+										TX1: "First"
+										,TX2: "Second"
 									}
-								},
-								spouse: {
-									name: "diana",
-									age: 27
+								}
+							},
+							spouse: {
+								name: "diana",
+								age: 27
+							}
+						}
+					},
+					companies: {
+						GUN: {
+							name: "GUN",
+							address: {
+								state: {
+									code: "CA",
+									county: {
+										CA1: "First"
+										,CA2: "Second"
+									}
 								}
 							}
 						},
-						companies: {
-							GUN: {
-								name: "GUN",
-								address: {
-									state: {
-										code: "CA",
-										county: {
-											CA1: "First"
-											,CA2: "Second"
-										}
-									}
-								}
-							},
-							ACME: {
-								name: "ACME",
-								address: {
-									state: {
-										code: "NY",
-										county: {_:{'#':'NYCOUNT'},
-											NY1: "First"
-											,NY2: "Second"
-										}
+						ACME: {
+							name: "ACME",
+							address: {
+								state: {
+									code: "NY",
+									county: {_:{'#':'NYCOUNT'},
+										NY1: "First"
+										,NY2: "Second"
 									}
 								}
 							}
 						}
+					}
 				});
 				gun.get('g/n/m/f/l/n/b/a/m/m/p/p/p/n').map().map().get('address').get('state').get('county').map().on(function(v,f){
 					check[f] = v;
@@ -3054,7 +3228,7 @@ describe('Gun', function(){
 			},100);
 		});
 
-		it('get put get get put reload get get then get', function(done){
+		it.only('get put get get put reload get get then get', function(done){
 			this.timeout(9000);
 			var gun = Gun();
 
@@ -3212,7 +3386,7 @@ describe('Gun', function(){
 			});
 		});
 
-		it('get any any later', function(done){
+		it.only('get any any later', function(done){
 			var s = Gun.state.map();s.soul = 'full/later';
 			gun.on('put', {$: gun, put: Gun.graph.ify({
 				hello: 'world',
@@ -3236,7 +3410,7 @@ describe('Gun', function(){
 			},400);
 		});
 
-		it('multiple times map', function(done){
+		it.only('multiple times map', function(done){
 			var gun = Gun();
 
 			gun.get('usersMM').put({
@@ -3934,7 +4108,7 @@ describe('Gun', function(){
 					done();
 				});
 			},400);
-		});return;
+		});
 
 		it('get get any parallel', function(done){
 			var s = Gun.state.map();s.soul = 'parallel/get/get';
@@ -6715,7 +6889,10 @@ describe('Gun', function(){
 					done();
 				}
 			});
-			gun.put({_:{'#':'g/n/m/f'},
+			gun.put({
+				_: {
+					'#': 'g/n/m/f',
+				},
 				alice: {
 					name: "alice",
 					age: 24,
@@ -6744,7 +6921,10 @@ describe('Gun', function(){
 
 		it("get users map path path val after", function(done){
 			var gun = Gun();
-			gun.put({_:{'#':'g/n/m/f/a'},
+			gun.put({
+				_: {
+					'#': 'g/n/m/f/a',
+				},
 				alice: {
 					name: "alice",
 					age: 24,
@@ -6785,7 +6965,10 @@ describe('Gun', function(){
 		it("get users map path path any later", function(done){
 			var gun = Gun();
 			gun.get('g/n/m/f/l').map().path('spouse').path('work');
-			gun.put({_:{'#':'g/n/m/f/l'},
+			gun.put({
+				_: {
+					'#': 'g/n/m/f/l',
+				},
 				alice: {
 					name: "alice",
 					age: 24,
